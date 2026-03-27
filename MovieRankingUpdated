@@ -1,0 +1,743 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineStar</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+    body { font-family: 'Figtree', sans-serif; min-height: 100vh; }
+
+    .app { min-height: 100vh; width: 100%; transition: background 0.3s, color 0.3s; }
+    .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+    /* Login */
+    .login-screen { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 24px; background: linear-gradient(135deg, #eef2ff 0%, #faf5ff 100%); }
+    .login-card { background: #fff; border-radius: 28px; box-shadow: 0 20px 60px rgba(0,0,0,.12); padding: 40px; width: 100%; max-width: 380px; text-align: center; }
+    .login-logo { background: #4f46e5; width: 64px; height: 64px; border-radius: 20px; display: flex; align-items: center; justify-content: center; margin: 0 auto 20px; box-shadow: 0 8px 24px rgba(79,70,229,.35); color: #fff; }
+    .login-card h1 { font-size: 1.8rem; font-weight: 900; color: #111827; letter-spacing: -.5px; margin-bottom: 4px; }
+    .login-card > p { font-size: .85rem; color: #9ca3af; margin-bottom: 28px; }
+    .login-label { display: block; font-size: .8rem; font-weight: 700; color: #374151; text-align: left; margin-bottom: 8px; }
+    .login-input { width: 100%; padding: 13px 16px; border-radius: 14px; border: 1.5px solid #e5e7eb; font-family: inherit; font-size: .95rem; outline: none; transition: border .2s, box-shadow .2s; margin-bottom: 12px; }
+    .login-input:focus { border-color: #4f46e5; box-shadow: 0 0 0 3px rgba(79,70,229,.15); }
+    .login-btn { width: 100%; padding: 13px; background: #4f46e5; color: #fff; border: none; border-radius: 14px; font-family: inherit; font-size: .95rem; font-weight: 800; cursor: pointer; }
+    .login-btn:hover { opacity: .9; }
+    .login-note { font-size: .72rem; color: #9ca3af; margin-top: 16px; line-height: 1.5; }
+
+    /* Header */
+    .header { padding: 18px 20px; margin-bottom: 28px; box-shadow: 0 4px 24px rgba(0,0,0,.15); }
+    .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { background: rgba(255,255,255,.2); padding: 8px; border-radius: 12px; display: flex; align-items: center; }
+    .logo h1 { font-size: 1.4rem; font-weight: 900; color: #fff; letter-spacing: -.5px; }
+    .logo p { font-size: .68rem; color: rgba(255,255,255,.7); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* Buttons */
+    .icon-btn { background: rgba(255,255,255,.2); color: #fff; padding: 8px; border-radius: 999px; border: none; cursor: pointer; display: inline-flex; align-items: center; transition: background .15s; }
+    .icon-btn:hover { background: rgba(255,255,255,.32); }
+    .ghost-btn { background: rgba(255,255,255,.2); color: #fff; padding: 8px 14px; font-size: .78rem; border: none; cursor: pointer; font-family: inherit; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; transition: background .15s; }
+    .ghost-btn:hover:not(:disabled) { background: rgba(255,255,255,.32); }
+    .ghost-btn:disabled { opacity: .6; cursor: not-allowed; }
+    .white-btn { background: #fff; color: #111; padding: 8px 18px; font-size: .8rem; border: none; cursor: pointer; font-family: inherit; font-weight: 700; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; box-shadow: 0 4px 12px rgba(0,0,0,.18); }
+    .white-btn:hover { opacity: .92; }
+    .user-chip { display: inline-flex; align-items: center; gap: 6px; background: rgba(255,255,255,.2); color: #fff; padding: 6px 12px; border-radius: 999px; font-size: .75rem; font-weight: 700; cursor: pointer; border: none; font-family: inherit; transition: background .15s; }
+    .user-chip:hover { background: rgba(255,255,255,.32); }
+    .solid-btn { color: #fff; padding: 12px; width: 100%; font-size: .9rem; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; gap: 6px; box-shadow: 0 4px 14px rgba(0,0,0,.18); border: none; cursor: pointer; font-family: inherit; font-weight: 700; }
+    .cancel-btn { background: transparent; color: #666; padding: 12px; width: 100%; font-size: .9rem; border-radius: 14px; display: inline-flex; align-items: center; justify-content: center; border: none; cursor: pointer; font-family: inherit; font-weight: 700; }
+    .cancel-btn:hover { background: #f3f4f6; }
+    .cancel-btn.dark { color: #9ca3af; }
+    .cancel-btn.dark:hover { background: #1f2937; }
+
+    /* Stats */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: #fff; padding: 18px 20px; border-radius: 18px; border: 1px solid #f0f0f0; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+    .stat-card.dark { background: #111827; border-color: #1f2937; }
+    .stat-label { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: .72rem; font-weight: 600; color: #9ca3af; }
+    .stat-value { font-size: 1.5rem; font-weight: 900; }
+
+    /* Toolbar */
+    .toolbar { background: #fff; border: 1px solid #f0f0f0; border-radius: 18px; padding: 12px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.05); }
+    .toolbar.dark { background: #111827; border-color: #1f2937; }
+    .search-wrap { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 160px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 8px 12px; }
+    .search-wrap.dark { background: #1f2937; border-color: #374151; }
+    .search-wrap input { background: transparent; border: none; outline: none; font-family: inherit; font-size: .85rem; width: 100%; color: inherit; }
+    .search-wrap input::placeholder { color: #9ca3af; }
+    .clear-btn { background: none; border: none; cursor: pointer; color: #9ca3af; display: inline-flex; padding: 0; }
+    .pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .pill { border: none; cursor: pointer; font-family: inherit; font-size: .72rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; }
+    .pill.off { background: #f3f4f6; color: #6b7280; }
+    .pill.off:hover { background: #e5e7eb; }
+    .pill.off.dark { background: #1f2937; color: #9ca3af; }
+    .pill.off.dark:hover { background: #374151; }
+    .pill.on { color: #fff; }
+
+    /* Sort */
+    .sort-wrap { position: relative; }
+    .sort-toggle { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; border: 1px solid #e5e7eb; background: #f9fafb; cursor: pointer; font-family: inherit; font-size: .8rem; font-weight: 600; color: #4b5563; white-space: nowrap; }
+    .sort-toggle.dark { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    .sort-menu { position: absolute; right: 0; top: calc(100% + 6px); min-width: 168px; border-radius: 14px; border: 1px solid #f0f0f0; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,.12); z-index: 30; overflow: hidden; }
+    .sort-menu.dark { background: #1f2937; border-color: #374151; }
+    .sort-item { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: .82rem; color: #374151; }
+    .sort-item:hover { background: #f9fafb; }
+    .sort-item.dark { color: #d1d5db; }
+    .sort-item.dark:hover { background: #374151; }
+    .sort-item.active { color: #fff; }
+
+    /* Section */
+    .sec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .sec-title { font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .sec-count { font-size: .75rem; color: #9ca3af; }
+
+    /* Movie list */
+    .movie-list { display: flex; flex-direction: column; gap: 10px; }
+    .empty { text-align: center; padding: 60px 20px; border-radius: 24px; border: 2px dashed #e5e7eb; }
+    .empty.dark { border-color: #1f2937; color: #6b7280; }
+    .empty svg { display: block; margin: 0 auto 14px; opacity: .3; }
+    .movie-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; transition: box-shadow .2s; }
+    .movie-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+    .movie-card.dark { background: #111827; border-color: #1f2937; }
+    .movie-card.dark:hover { border-color: #374151; }
+    .card-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    .movie-name { font-weight: 800; font-size: .95rem; line-height: 1.3; }
+    .movie-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .badge { font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+    .card-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .2s; flex-shrink: 0; }
+    .movie-card:hover .card-actions { opacity: 1; }
+    .act-btn { background: transparent; border: none; cursor: pointer; padding: 7px; border-radius: 999px; display: flex; align-items: center; color: #9ca3af; }
+    .act-btn.edit:hover { background: #eff6ff; color: #3b82f6; }
+    .act-btn.edit.dark:hover { background: #1e3a5f; color: #60a5fa; }
+    .act-btn.del:hover { background: #fef2f2; color: #ef4444; }
+    .act-btn.del.dark:hover { background: #450a0a; color: #f87171; }
+
+    /* Inline edit */
+    .inline-row { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+    .inline-in { font-family: inherit; font-size: .9rem; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #e5e7eb; outline: none; flex: 1; min-width: 120px; }
+    .inline-in.dark { background: #1f2937; border-color: #374151; color: #fff; }
+    .inline-sel { font-family: inherit; font-size: .82rem; padding: 6px 10px; border-radius: 10px; border: 1px solid #e5e7eb; outline: none; }
+    .inline-sel.dark { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    .ok-btn { border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #fff; display: flex; align-items: center; }
+    .no-btn { background: #e5e7eb; border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #4b5563; display: flex; align-items: center; }
+    .no-btn:hover { background: #d1d5db; }
+
+    /* Stars */
+    .stars { display: flex; gap: 2px; }
+    .star-wrap { cursor: default; transition: transform .1s; display: inline-flex; }
+    .star-wrap.i { cursor: pointer; }
+    .star-wrap.i:hover { transform: scale(1.25); }
+
+    /* Modal */
+    .overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; }
+    .modal { width: 100%; max-width: 440px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; }
+    .modal-head { padding: 24px; color: #fff; }
+    .modal-head h2 { font-size: 1.15rem; font-weight: 900; }
+    .modal-head p { font-size: .8rem; opacity: .75; margin-top: 2px; }
+    .modal-body { padding: 24px; }
+    .fg { margin-bottom: 20px; }
+    .flabel { display: block; font-size: .82rem; font-weight: 700; margin-bottom: 8px; color: #374151; }
+    .flabel.dark { color: #d1d5db; }
+    .finput { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #e5e7eb; font-family: inherit; font-size: .88rem; outline: none; }
+    .finput:focus { border-color: #a5b4fc; box-shadow: 0 0 0 3px rgba(165,180,252,.2); }
+    .finput.dark { background: #1f2937; border-color: #374151; color: #fff; }
+    .finput.dark::placeholder { color: #6b7280; }
+    .ggrid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .gbtn { border: 1px solid #e5e7eb; background: #fff; font-family: inherit; font-size: .8rem; font-weight: 600; padding: 9px; border-radius: 12px; cursor: pointer; }
+    .gbtn:hover { border-color: #d1d5db; }
+    .gbtn.dark { background: #1f2937; color: #9ca3af; border-color: #374151; }
+    .gbtn.sel { color: #fff; border-color: transparent; }
+    .rbox { border-radius: 12px; padding: 16px; display: flex; justify-content: center; }
+    .rbox.lt { background: #f9fafb; }
+    .rbox.dk { background: #1f2937; }
+    .mact { display: flex; gap: 10px; }
+
+    /* AI panel */
+    .ai-modal { width: 100%; max-width: 520px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; max-height: 85vh; display: flex; flex-direction: column; }
+    .ai-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .spin-wrap { text-align: center; padding: 48px 0; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spin-txt { font-size: .83rem; color: #9ca3af; }
+    .err-msg { text-align: center; padding: 32px 0; color: #ef4444; }
+    .rec-card { border-radius: 16px; border: 1px solid #f0f0f0; padding: 14px; display: flex; align-items: flex-start; gap: 12px; background: #f9fafb; }
+    .rec-card.dark { background: #1f2937; border-color: #374151; }
+    .rec-info { flex: 1; min-width: 0; }
+    .rec-tr { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+    .rec-name { font-weight: 800; font-size: .88rem; }
+    .rec-yr { font-size: .72rem; font-weight: 400; color: #9ca3af; }
+    .rec-why { font-size: .76rem; color: #6b7280; line-height: 1.4; }
+    .rec-why.dark { color: #9ca3af; }
+    .rec-add { flex-shrink: 0; border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #fff; display: flex; align-items: center; }
+    .rec-add:hover { opacity: .85; }
+    .rec-add.done { background: #dcfce7 !important; color: #16a34a; cursor: default; }
+    .refresh-btn { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #e5e7eb; background: transparent; font-family: inherit; font-size: .82rem; font-weight: 600; color: #6b7280; cursor: pointer; }
+    .refresh-btn:hover { background: #f9fafb; }
+    .refresh-btn.dark { border-color: #374151; color: #9ca3af; }
+    .refresh-btn.dark:hover { background: #1f2937; }
+
+    /* Toast */
+    .toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%); background: #111827; color: #fff; padding: 10px 20px; border-radius: 999px; font-size: .82rem; font-weight: 600; box-shadow: 0 8px 24px rgba(0,0,0,.2); z-index: 200; pointer-events: none; animation: fadeup .25s ease; }
+    @keyframes fadeup { from { opacity:0; transform: translateX(-50%) translateY(8px); } to { opacity:1; transform: translateX(-50%) translateY(0); } }
+
+    /* Footer */
+    .footer { text-align: center; padding: 28px 20px; font-size: .72rem; color: #9ca3af; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .frow { display: flex; align-items: center; gap: 6px; }
+
+    /* Theme colors */
+    .th-Action-bg  { background: #dc2626; } .th-Action-c  { color: #dc2626; }
+    .th-Action-bl  { background: #fef2f2; color: #dc2626; } .th-Action-bd  { background: rgba(153,27,27,.3); color: #f87171; }
+    .th-Comedy-bg  { background: #eab308; } .th-Comedy-c  { color: #ca8a04; }
+    .th-Comedy-bl  { background: #fefce8; color: #ca8a04; } .th-Comedy-bd  { background: rgba(113,63,18,.3); color: #fbbf24; }
+    .th-Drama-bg   { background: #1d4ed8; } .th-Drama-c   { color: #1d4ed8; }
+    .th-Drama-bl   { background: #eff6ff; color: #1d4ed8; } .th-Drama-bd   { background: rgba(30,58,138,.3); color: #60a5fa; }
+    .th-SciFi-bg   { background: #9333ea; } .th-SciFi-c   { color: #9333ea; }
+    .th-SciFi-bl   { background: #faf5ff; color: #9333ea; } .th-SciFi-bd   { background: rgba(88,28,135,.3); color: #c084fc; }
+    .th-Horror-bg  { background: #111827; } .th-Horror-c  { color: #374151; }
+    .th-Horror-bl  { background: #f3f4f6; color: #374151; } .th-Horror-bd  { background: rgba(17,24,39,.5); color: #9ca3af; }
+    .th-Romance-bg { background: #ec4899; } .th-Romance-c { color: #ec4899; }
+    .th-Romance-bl { background: #fdf2f8; color: #ec4899; } .th-Romance-bd { background: rgba(131,24,67,.3); color: #f472b6; }
+    .th-Default-bg { background: #4f46e5; } .th-Default-c { color: #4f46e5; }
+    .th-Default-bl { background: #eef2ff; color: #4f46e5; } .th-Default-bd { background: rgba(55,48,163,.3); color: #818cf8; }
+
+    .abg-Action  { background: #fff5f5; } .abg-Comedy  { background: #fefce8; }
+    .abg-Drama   { background: #eff6ff; } .abg-SciFi   { background: #faf5ff; }
+    .abg-Horror  { background: #f9fafb; } .abg-Romance { background: #fdf2f8; }
+    .abg-Default { background: #eef2ff; } .abg-dark    { background: #030712; }
+
+    @media (max-width:600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid .stat-card:last-child { grid-column: span 2; }
+      .header-actions { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+<script type="text/babel">
+const { useState, useEffect, useMemo, useCallback, useRef } = React;
+
+/* ── Per-user storage: window.storage when available (artifact env), else localStorage ── */
+const Store = {
+  async get(user, key) {
+    const k = `cs:${user}:${key}`;
+    if (window.storage) {
+      try { const r = await window.storage.get(k); return r ? JSON.parse(r.value) : null; }
+      catch { return null; }
+    }
+    try { const v = localStorage.getItem(k); return v ? JSON.parse(v) : null; }
+    catch { return null; }
+  },
+  async set(user, key, val) {
+    const k = `cs:${user}:${key}`;
+    const s = JSON.stringify(val);
+    if (window.storage) { try { await window.storage.set(k, s); } catch {} return; }
+    try { localStorage.setItem(k, s); } catch {}
+  },
+};
+
+const GENRE_META = {
+  Action:  { tk: 'Action',  bg: '#dc2626' },
+  Comedy:  { tk: 'Comedy',  bg: '#eab308' },
+  Drama:   { tk: 'Drama',   bg: '#1d4ed8' },
+  'Sci-Fi':{ tk: 'SciFi',   bg: '#9333ea' },
+  Horror:  { tk: 'Horror',  bg: '#111827' },
+  Romance: { tk: 'Romance', bg: '#ec4899' },
+  Default: { tk: 'Default', bg: '#4f46e5' },
+};
+
+const GENRES = ['Action','Comedy','Drama','Sci-Fi','Horror','Romance'];
+const SORTS = [
+  { v:'newest', l:'Newest First' }, { v:'oldest', l:'Oldest First' },
+  { v:'rating_desc', l:'Highest Rated' }, { v:'rating_asc', l:'Lowest Rated' },
+  { v:'title_asc', l:'Title A–Z' }, { v:'title_desc', l:'Title Z–A' },
+];
+
+const DEMO = [
+  { id:1, title:'Inception',       genre:'Sci-Fi',  rating:5, addedAt: Date.now()-3000 },
+  { id:2, title:'The Dark Knight', genre:'Action',  rating:5, addedAt: Date.now()-2000 },
+  { id:3, title:'Superbad',        genre:'Comedy',  rating:4, addedAt: Date.now()-1000 },
+];
+
+const tk = g => (GENRE_META[g] || GENRE_META.Default).tk;
+const avatarBg = g => (GENRE_META[g] || GENRE_META.Default).bg;
+
+/* ── Icons ── */
+const SVG = ({ d, size=16, fill='none' }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+    strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"
+    style={{ flexShrink:0, display:'inline-block' }}>
+    {(Array.isArray(d)?d:[d]).map((p,i)=><path key={i} d={p}/>)}
+  </svg>
+);
+
+const Ic = {
+  Clap: ()=><SVG size={26} d={["M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z","m6.2 5.3 3.1 3.9","m12.4 3.4 3.1 3.8","M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"]}/>,
+  Film: ({size=18})=><SVG size={size} d={["M7 2h10","M7 2v4m10-4v4","M7 22v-4m10 4v-4","M3 6h18","M3 18h18","M3 10h18","M3 14h18"]}/>,
+  Star: ({size=16,filled=false})=><SVG size={size} fill={filled?'currentColor':'none'} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/>,
+  Trend: ()=><SVG d="M22 7 13.5 15.5l-5-5L2 17M22 7h-5M22 7v5"/>,
+  Hist: ()=><SVG d={["M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8","M3 3v5h5","M12 7v5l4 2"]}/>,
+  Search: ()=><SVG d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z"/>,
+  Sliders: ()=><SVG d={["M4 21v-7","M4 10V3","M12 21v-9","M12 8V3","M20 21v-5","M20 12V3","M1 14h6","M9 8h6","M17 16h6"]}/>,
+  Spark: ({size=16})=><SVG size={size} d={["M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z","M20 3v4","M22 5h-4","M4 17v2","M5 18H3"]}/>,
+  X: ({size=18})=><SVG size={size} d="M18 6 6 18M6 6l12 12"/>,
+  Moon: ()=><SVG d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"/>,
+  Sun: ()=><SVG d={["M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42","M12 17A5 5 0 1 0 12 7a5 5 0 0 0 0 10z"]}/>,
+  Chev: ()=><SVG d="M6 9l6 6 6-6"/>,
+  Edit: ()=><SVG d={["M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"]}/>,
+  Check: ({size=16})=><SVG size={size} d="M20 6 9 17l-5-5"/>,
+  Trash: ()=><SVG d={["M3 6h18","M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6","M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2","M10 11v6","M14 11v6"]}/>,
+  Plus: ({size=16})=><SVG size={size} d="M12 5v14M5 12h14"/>,
+  Info: ()=><SVG size={13} d={["M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z","M12 16v-4","M12 8h.01"]}/>,
+  User: ()=><SVG size={14} d={["M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2","M12 11a4 4 0 1 0 0-8 4 4 0 0 0 0 8z"]}/>,
+  Out: ()=><SVG size={14} d={["M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4","M16 17l5-5-5-5","M21 12H9"]}/>,
+};
+
+/* ── Star rating ── */
+function Stars({ rating, interactive=false, onRate=()=>{}, size=16 }) {
+  const [hov, setHov] = useState(0);
+  const active = interactive ? (hov||rating) : rating;
+  return (
+    <div className="stars">
+      {[1,2,3,4,5].map(s=>(
+        <span key={s} className={`star-wrap${interactive?' i':''}`}
+          style={{color: s<=active ? '#facc15':'#d1d5db'}}
+          onClick={()=>interactive&&onRate(s)}
+          onMouseEnter={()=>interactive&&setHov(s)}
+          onMouseLeave={()=>interactive&&setHov(0)}>
+          <Ic.Star size={size} filled={s<=active}/>
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ── Login screen ── */
+function Login({ onLogin }) {
+  const [name, setName] = useState('');
+  const go = () => { const t=name.trim(); if(t) onLogin(t); };
+  return (
+    <div className="login-screen">
+      <div className="login-card">
+        <div className="login-logo"><Ic.Clap/></div>
+        <h1>CineStar</h1>
+        <p>Your personal movie tracker</p>
+        <label className="login-label">Who's watching?</label>
+        <input className="login-input" placeholder="Enter your name…" value={name} autoFocus
+          onChange={e=>setName(e.target.value)} onKeyDown={e=>e.key==='Enter'&&go()}/>
+        <button className="login-btn" onClick={go}>Start Tracking →</button>
+        <p className="login-note">Your list is saved privately to your name.<br/>No password — just use a unique name.</p>
+      </div>
+    </div>
+  );
+}
+
+/* ── Main App ── */
+function App() {
+  const [user, setUser]       = useState(null);
+  const [movies, setMovies]   = useState(null);
+  const [dark, setDark]       = useState(false);
+  const [search, setSearch]   = useState('');
+  const [genre, setGenre]     = useState('All');
+  const [sort, setSort]       = useState('newest');
+  const [showAdd, setShowAdd] = useState(false);
+  const [newM, setNewM]       = useState({ title:'', genre:'Action', rating:3 });
+  const [editId, setEditId]   = useState(null);
+  const [editD, setEditD]     = useState({});
+  const [aiOpen, setAiOpen]   = useState(false);
+  const [aiLoad, setAiLoad]   = useState(false);
+  const [aiRecs, setAiRecs]   = useState([]);
+  const [aiErr, setAiErr]     = useState('');
+  const [sortOpen, setSortOpen]= useState(false);
+  const [toast, setToast]     = useState(null);
+  const toastT = useRef(null);
+
+  const showToast = msg => {
+    setToast(msg);
+    clearTimeout(toastT.current);
+    toastT.current = setTimeout(()=>setToast(null), 2400);
+  };
+
+  /* Load user data */
+  const login = useCallback(async name => {
+    setUser(name);
+    const [m, d] = await Promise.all([Store.get(name,'movies'), Store.get(name,'dark')]);
+    setMovies(m || DEMO);
+    setDark(d===true);
+  }, []);
+
+  /* Persist whenever movies/dark change */
+  useEffect(()=>{ if(user&&movies!==null) Store.set(user,'movies',movies); }, [movies,user]);
+  useEffect(()=>{ if(user) Store.set(user,'dark',dark); }, [dark,user]);
+
+  /* Derived */
+  const topGenre = useMemo(()=>{
+    if(!movies||!movies.length) return 'Default';
+    const c = movies.reduce((a,m)=>{ a[m.genre]=(a[m.genre]||0)+1; return a; },{});
+    return Object.keys(c).reduce((a,b)=>c[a]>c[b]?a:b);
+  },[movies]);
+
+  const TK = tk(topGenre);
+
+  const filtered = useMemo(()=>{
+    if(!movies) return [];
+    let l=[...movies];
+    if(search.trim()) l=l.filter(m=>m.title.toLowerCase().includes(search.toLowerCase()));
+    if(genre!=='All') l=l.filter(m=>m.genre===genre);
+    switch(sort){
+      case 'newest':     l.sort((a,b)=>b.addedAt-a.addedAt); break;
+      case 'oldest':     l.sort((a,b)=>a.addedAt-b.addedAt); break;
+      case 'rating_desc':l.sort((a,b)=>b.rating-a.rating); break;
+      case 'rating_asc': l.sort((a,b)=>a.rating-b.rating); break;
+      case 'title_asc':  l.sort((a,b)=>a.title.localeCompare(b.title)); break;
+      case 'title_desc': l.sort((a,b)=>b.title.localeCompare(a.title)); break;
+    }
+    return l;
+  },[movies,search,genre,sort]);
+
+  const avg = movies&&movies.length
+    ? (movies.reduce((a,m)=>a+m.rating,0)/movies.length).toFixed(1) : '0.0';
+
+  /* Actions */
+  const addMovie = ()=>{
+    if(!newM.title.trim()) return;
+    setMovies(p=>[{...newM, id:Date.now(), addedAt:Date.now()}, ...p]);
+    setNewM({title:'',genre:'Action',rating:3});
+    setShowAdd(false);
+    showToast('Movie added ✓');
+  };
+  const delMovie = id=>{ setMovies(p=>p.filter(m=>m.id!==id)); showToast('Removed'); };
+  const startEdit = m=>{ setEditId(m.id); setEditD({title:m.title,genre:m.genre,rating:m.rating}); };
+  const saveEdit = id=>{ setMovies(p=>p.map(m=>m.id===id?{...m,...editD}:m)); setEditId(null); showToast('Saved ✓'); };
+
+  /* AI recs */
+  const getAI = async ()=>{
+    if(!movies||!movies.length){ setAiErr('Add some movies first!'); return; }
+    setAiLoad(true); setAiErr(''); setAiRecs([]);
+    try {
+      const list = movies.map(m=>`"${m.title}" (${m.genre}, ${m.rating}/5)`).join(', ');
+      const prompt = `Movie watch history: ${list}
+
+Recommend exactly 5 movies NOT in this list that the person would enjoy.
+
+Reply ONLY with a raw JSON array — no markdown, no code fences, no extra text:
+[{"title":"Name","genre":"Genre","reason":"One sentence","year":2020}]
+
+genre must be one of: Action, Comedy, Drama, Sci-Fi, Horror, Romance`;
+
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: 'claude-sonnet-4-20250514',
+          max_tokens: 1000,
+          messages: [{ role:'user', content: prompt }],
+        }),
+      });
+
+      if (!res.ok) {
+        const e = await res.json().catch(()=>({}));
+        throw new Error(e?.error?.message || `HTTP ${res.status}`);
+      }
+
+      const data = await res.json();
+      let raw = (data.content||[]).filter(c=>c.type==='text').map(c=>c.text).join('').trim();
+      // strip any accidental markdown fences
+      raw = raw.replace(/^```(?:json)?\s*/i,'').replace(/\s*```$/,'').trim();
+      // extract array if extra text crept in
+      const m = raw.match(/\[[\s\S]*\]/);
+      const parsed = JSON.parse(m ? m[0] : raw);
+      if(!Array.isArray(parsed)||!parsed.length) throw new Error('Empty response');
+      setAiRecs(parsed);
+    } catch(e) {
+      console.error(e);
+      setAiErr(e.message||'Something went wrong. Please try again.');
+    }
+    setAiLoad(false);
+  };
+
+  const addRec = rec=>{
+    if(movies.some(m=>m.title.toLowerCase()===rec.title.toLowerCase())) return;
+    setMovies(p=>[{id:Date.now(),title:rec.title,genre:rec.genre,rating:3,addedAt:Date.now()},...p]);
+    showToast(`Added "${rec.title}" ✓`);
+  };
+
+  const logout = ()=>{ setUser(null); setMovies(null); setDark(false); setSearch(''); setGenre('All'); setAiOpen(false); setAiRecs([]); };
+
+  /* Gates */
+  if(!user) return <Login onLogin={login}/>;
+  if(movies===null) return (
+    <div style={{minHeight:'100vh',display:'flex',alignItems:'center',justifyContent:'center',background:'#eef2ff'}}>
+      <div className="spinner" style={{borderColor:'#c7d2fe',borderTopColor:'transparent'}}></div>
+    </div>
+  );
+
+  const appCls = `app ${dark?'abg-dark':`abg-${TK}`}`;
+  const c = dark ? '#f9fafb' : '#111827';
+
+  return (
+    <div className={appCls} style={{color:c}}>
+
+      {/* Header */}
+      <header className={`header th-${TK}-bg`}>
+        <div className="container">
+          <div className="header-inner">
+            <div className="logo">
+              <div className="logo-icon"><Ic.Clap/></div>
+              <div><h1>CineStar</h1><p>Your cinematic universe</p></div>
+            </div>
+            <div className="header-actions">
+              <button className="icon-btn" onClick={()=>setDark(d=>!d)} title="Toggle dark mode">
+                {dark?<Ic.Sun/>:<Ic.Moon/>}
+              </button>
+              <button className={`ghost-btn`} disabled={aiLoad}
+                onClick={()=>{ setAiOpen(true); if(!aiLoad&&aiRecs.length===0) getAI(); }}>
+                <Ic.Spark size={15}/> {aiLoad?'Loading…':'AI Picks'}
+              </button>
+              <button className="white-btn" onClick={()=>setShowAdd(true)}>
+                <Ic.Plus size={15}/> Add Movie
+              </button>
+              <button className="user-chip" onClick={logout} title="Switch user">
+                <Ic.User/> {user} <Ic.Out/>
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container" style={{paddingBottom:60}}>
+
+        {/* Stats */}
+        <div className="stats-grid">
+          {[
+            {icon:<Ic.Film/>, label:'Watched',   val:movies.length, col:null},
+            {icon:<Ic.Trend/>,label:'Top Genre',  val:topGenre,      col:null},
+            {icon:<Ic.Star size={18} filled/>,label:'Avg Rating',val:avg,col:'#eab308'},
+          ].map(({icon,label,val,col})=>(
+            <div key={label} className={`stat-card${dark?' dark':''}`}>
+              <div className="stat-label">
+                <span className={col?'':`th-${TK}-c`} style={col?{color:col}:{}}>{icon}</span>
+                {label}
+              </div>
+              <div className="stat-value">{val}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Toolbar */}
+        <div className={`toolbar${dark?' dark':''}`}>
+          <div className={`search-wrap${dark?' dark':''}`} style={{color:c}}>
+            <span style={{color:'#9ca3af'}}><Ic.Search/></span>
+            <input placeholder="Search movies…" value={search} onChange={e=>setSearch(e.target.value)}/>
+            {search && <button className="clear-btn" onClick={()=>setSearch('')}><Ic.X size={14}/></button>}
+          </div>
+
+          <div className="pills">
+            {['All',...GENRES].map(g=>{
+              const on = genre===g;
+              return (
+                <button key={g}
+                  className={`pill ${on?`on th-${TK}-bg`:`off${dark?' dark':''}`}`}
+                  style={on?{color:'#fff'}:{}}
+                  onClick={()=>setGenre(g)}>{g}</button>
+              );
+            })}
+          </div>
+
+          <div className="sort-wrap">
+            <button className={`sort-toggle${dark?' dark':''}`} onClick={()=>setSortOpen(o=>!o)}>
+              <Ic.Sliders/> {SORTS.find(o=>o.v===sort)?.l} <Ic.Chev/>
+            </button>
+            {sortOpen && (
+              <div className={`sort-menu${dark?' dark':''}`}>
+                {SORTS.map(o=>(
+                  <button key={o.v}
+                    className={`sort-item${dark?' dark':''} ${sort===o.v?`active th-${TK}-bg`:''}`}
+                    style={sort===o.v?{color:'#fff'}:{}}
+                    onClick={()=>{setSort(o.v);setSortOpen(false);}}>{o.l}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Heading */}
+        <div className="sec-header">
+          <h2 className="sec-title"><Ic.Hist/> Watch History</h2>
+          <span className="sec-count">{filtered.length} of {movies.length} films</span>
+        </div>
+
+        {/* List */}
+        <div className="movie-list">
+          {filtered.length===0 ? (
+            <div className={`empty${dark?' dark':''}`}>
+              <Ic.Film size={40}/>
+              <p style={{fontWeight:600,marginTop:8}}>
+                {movies.length===0?'No movies yet — add your first!':'No movies match your filters.'}
+              </p>
+            </div>
+          ) : filtered.map(m=>{
+            const GTK = tk(m.genre);
+            const badgeCls = dark ? `th-${GTK}-bd` : `th-${GTK}-bl`;
+            return (
+              <div key={m.id} className={`movie-card${dark?' dark':''}`}>
+                {editId===m.id ? (
+                  <div className="inline-row" style={{flex:1}}>
+                    <input className={`inline-in${dark?' dark':''}`} value={editD.title}
+                      onChange={e=>setEditD({...editD,title:e.target.value})} autoFocus/>
+                    <select className={`inline-sel${dark?' dark':''}`} value={editD.genre}
+                      onChange={e=>setEditD({...editD,genre:e.target.value})}>
+                      {GENRES.map(g=><option key={g}>{g}</option>)}
+                    </select>
+                    <Stars rating={editD.rating} interactive onRate={v=>setEditD({...editD,rating:v})} size={20}/>
+                    <button className={`ok-btn th-${TK}-bg`} onClick={()=>saveEdit(m.id)}><Ic.Check size={15}/></button>
+                    <button className="no-btn" onClick={()=>setEditId(null)}><Ic.X size={15}/></button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="card-left">
+                      <div className="avatar" style={{background:avatarBg(m.genre)}}>{m.title.charAt(0)}</div>
+                      <div>
+                        <div className="movie-name" style={{color:dark?'#f9fafb':'#111827'}}>{m.title}</div>
+                        <div className="movie-meta">
+                          <span className={`badge ${badgeCls}`}>{m.genre}</span>
+                          <Stars rating={m.rating}/>
+                        </div>
+                      </div>
+                    </div>
+                    <div className="card-actions">
+                      <button className={`act-btn edit${dark?' dark':''}`} onClick={()=>startEdit(m)}><Ic.Edit/></button>
+                      <button className={`act-btn del${dark?' dark':''}`} onClick={()=>delMovie(m.id)}><Ic.Trash/></button>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+
+      {/* Add modal */}
+      {showAdd && (
+        <div className="overlay" onClick={()=>setShowAdd(false)}>
+          <div className="modal" onClick={e=>e.stopPropagation()}>
+            <div className={`modal-head th-${TK}-bg`}>
+              <h2>New Entry</h2><p>What have you been watching?</p>
+            </div>
+            <div className="modal-body" style={{background:dark?'#111827':'#fff'}}>
+              <div className="fg">
+                <label className={`flabel${dark?' dark':''}`}>Movie Title</label>
+                <input autoFocus type="text" placeholder="e.g. Interstellar"
+                  className={`finput${dark?' dark':''}`} value={newM.title}
+                  onChange={e=>setNewM({...newM,title:e.target.value})}
+                  onKeyDown={e=>e.key==='Enter'&&addMovie()}/>
+              </div>
+              <div className="fg">
+                <label className={`flabel${dark?' dark':''}`}>Genre</label>
+                <div className="ggrid">
+                  {GENRES.map(g=>(
+                    <button key={g}
+                      className={`gbtn${dark?' dark':''} ${newM.genre===g?`sel th-${tk(g)}-bg`:''}`}
+                      onClick={()=>setNewM({...newM,genre:g})}>{g}</button>
+                  ))}
+                </div>
+              </div>
+              <div className="fg">
+                <label className={`flabel${dark?' dark':''}`}>Your Rating</label>
+                <div className={`rbox ${dark?'dk':'lt'}`}>
+                  <Stars rating={newM.rating} interactive onRate={v=>setNewM({...newM,rating:v})} size={28}/>
+                </div>
+              </div>
+              <div className="mact">
+                <button className={`cancel-btn${dark?' dark':''}`} onClick={()=>setShowAdd(false)}>Cancel</button>
+                <button className={`solid-btn th-${TK}-bg`} onClick={addMovie}>Save Movie</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI panel */}
+      {aiOpen && (
+        <div className="overlay" onClick={()=>setAiOpen(false)}>
+          <div className="ai-modal" onClick={e=>e.stopPropagation()}>
+            <div className={`modal-head th-${TK}-bg`} style={{display:'flex',justifyContent:'space-between',alignItems:'flex-start'}}>
+              <div>
+                <h2 style={{display:'flex',alignItems:'center',gap:8}}><Ic.Spark size={18}/> AI Picks for {user}</h2>
+                <p>Tailored to your taste</p>
+              </div>
+              <button onClick={()=>setAiOpen(false)}
+                style={{background:'rgba(255,255,255,.2)',border:'none',cursor:'pointer',color:'#fff',padding:6,borderRadius:999,display:'flex'}}>
+                <Ic.X size={17}/>
+              </button>
+            </div>
+            <div className="ai-body" style={{background:dark?'#111827':'#fff'}}>
+              {aiLoad && (
+                <div className="spin-wrap">
+                  <div className="spinner"></div>
+                  <p className="spin-txt">Analyzing {user}'s taste…</p>
+                </div>
+              )}
+              {!aiLoad && aiErr && (
+                <div className="err-msg">
+                  <p style={{marginBottom:12}}>{aiErr}</p>
+                  <button className={`solid-btn th-${TK}-bg`} style={{width:'auto',padding:'8px 20px'}} onClick={getAI}>Try Again</button>
+                </div>
+              )}
+              {!aiLoad && !aiErr && aiRecs.length===0 && (
+                <div style={{textAlign:'center',padding:'32px 0',color:'#9ca3af'}}>
+                  <p style={{marginBottom:12}}>No recommendations yet.</p>
+                  <button className={`solid-btn th-${TK}-bg`} style={{width:'auto',padding:'8px 20px'}} onClick={getAI}>Get Recommendations</button>
+                </div>
+              )}
+              {!aiLoad && aiRecs.map((rec,i)=>{
+                const GTK = tk(rec.genre);
+                const badgeCls = dark ? `th-${GTK}-bd` : `th-${GTK}-bl`;
+                const done = movies.some(m=>m.title.toLowerCase()===rec.title.toLowerCase());
+                return (
+                  <div key={i} className={`rec-card${dark?' dark':''}`}>
+                    <div className="avatar" style={{background:avatarBg(rec.genre),width:40,height:40}}>{rec.title.charAt(0)}</div>
+                    <div className="rec-info">
+                      <div className="rec-tr">
+                        <span className="rec-name" style={{color:dark?'#f9fafb':'#111827'}}>
+                          {rec.title} {rec.year&&<span className="rec-yr">({rec.year})</span>}
+                        </span>
+                        <span className={`badge ${badgeCls}`}>{rec.genre}</span>
+                      </div>
+                      <p className={`rec-why${dark?' dark':''}`}>{rec.reason}</p>
+                    </div>
+                    <button className={`rec-add${done?' done':`th-${TK}-bg`}`}
+                      onClick={()=>!done&&addRec(rec)} disabled={done}
+                      title={done?'Already in list':'Add to list'}>
+                      {done?<Ic.Check size={15}/>:<Ic.Plus size={15}/>}
+                    </button>
+                  </div>
+                );
+              })}
+              {!aiLoad && aiRecs.length>0 && (
+                <button className={`refresh-btn${dark?' dark':''}`} onClick={getAI}>↻ Refresh Recommendations</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {sortOpen && <div style={{position:'fixed',inset:0,zIndex:10}} onClick={()=>setSortOpen(false)}/>}
+      {toast && <div className="toast">{toast}</div>}
+
+      <footer className="footer">
+        <div className="frow"><Ic.Info/> Saved privately for {user} · Theme adapts to top genre</div>
+        <div>© 2025 CineStar</div>
+      </footer>
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App/>);
+</script>
+</body>
+</html>
