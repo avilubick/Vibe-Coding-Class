@@ -1,0 +1,702 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>CineStar</title>
+  <script src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Figtree:wght@400;500;600;700;900&display=swap');
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body { font-family: 'Figtree', sans-serif; min-height: 100vh; }
+
+    /* ── Layout ── */
+    .app { min-height: 100vh; width: 100%; transition: background 0.3s, color 0.3s; }
+    .container { max-width: 860px; margin: 0 auto; padding: 0 20px; }
+
+    /* ── Header ── */
+    .header { padding: 20px; margin-bottom: 28px; box-shadow: 0 4px 24px rgba(0,0,0,.15); }
+    .header-inner { display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; }
+    .logo { display: flex; align-items: center; gap: 12px; }
+    .logo-icon { background: rgba(255,255,255,.2); padding: 8px; border-radius: 12px; display: flex; align-items: center; }
+    .logo h1 { font-size: 1.5rem; font-weight: 900; color: #fff; letter-spacing: -.5px; }
+    .logo p { font-size: .7rem; color: rgba(255,255,255,.7); margin-top: 1px; }
+    .header-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+
+    /* ── Buttons ── */
+    .btn { border: none; cursor: pointer; font-family: inherit; font-weight: 700; border-radius: 999px; transition: all .15s; display: inline-flex; align-items: center; gap: 6px; }
+    .btn:active { transform: scale(.96); }
+    .btn-icon { background: rgba(255,255,255,.2); color: #fff; padding: 8px; border-radius: 999px; }
+    .btn-icon:hover { background: rgba(255,255,255,.3); }
+    .btn-ghost { background: rgba(255,255,255,.2); color: #fff; padding: 8px 16px; font-size: .8rem; }
+    .btn-ghost:hover { background: rgba(255,255,255,.3); }
+    .btn-primary-white { background: #fff; color: #111; padding: 8px 18px; font-size: .8rem; box-shadow: 0 4px 12px rgba(0,0,0,.2); }
+    .btn-primary-white:hover { opacity: .9; }
+    .btn-solid { color: #fff; padding: 12px; width: 100%; font-size: .9rem; border-radius: 14px; justify-content: center; box-shadow: 0 4px 14px rgba(0,0,0,.2); }
+    .btn-cancel { background: transparent; color: #666; padding: 12px; width: 100%; font-size: .9rem; border-radius: 14px; justify-content: center; border: none; }
+    .btn-cancel:hover { background: #f3f4f6; }
+    .btn-cancel.dark { color: #9ca3af; }
+    .btn-cancel.dark:hover { background: #1f2937; }
+
+    /* ── Stats ── */
+    .stats-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; margin-bottom: 24px; }
+    .stat-card { background: #fff; padding: 20px; border-radius: 18px; border: 1px solid #f0f0f0; box-shadow: 0 1px 4px rgba(0,0,0,.05); transition: background .3s, border .3s; }
+    .stat-card.dark { background: #111827; border-color: #1f2937; }
+    .stat-label { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; font-size: .72rem; font-weight: 600; color: #9ca3af; }
+    .stat-value { font-size: 1.6rem; font-weight: 900; }
+
+    /* ── Toolbar ── */
+    .toolbar { background: #fff; border: 1px solid #f0f0f0; border-radius: 18px; padding: 14px; margin-bottom: 20px; display: flex; flex-wrap: wrap; gap: 10px; box-shadow: 0 1px 4px rgba(0,0,0,.05); transition: background .3s, border .3s; }
+    .toolbar.dark { background: #111827; border-color: #1f2937; }
+    .search-box { display: flex; align-items: center; gap: 8px; flex: 1; min-width: 160px; background: #f9fafb; border: 1px solid #e5e7eb; border-radius: 12px; padding: 8px 12px; }
+    .search-box.dark { background: #1f2937; border-color: #374151; }
+    .search-box input { background: transparent; border: none; outline: none; font-family: inherit; font-size: .85rem; width: 100%; color: inherit; }
+    .search-box input::placeholder { color: #9ca3af; }
+    .genre-pills { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+    .pill { border: none; cursor: pointer; font-family: inherit; font-size: .72rem; font-weight: 700; padding: 6px 12px; border-radius: 999px; transition: all .15s; }
+    .pill.inactive { background: #f3f4f6; color: #6b7280; }
+    .pill.inactive:hover { background: #e5e7eb; }
+    .pill.inactive.dark { background: #1f2937; color: #9ca3af; }
+    .pill.inactive.dark:hover { background: #374151; }
+
+    /* ── Sort dropdown ── */
+    .sort-wrap { position: relative; }
+    .sort-btn { display: flex; align-items: center; gap: 6px; padding: 8px 12px; border-radius: 12px; border: 1px solid #e5e7eb; background: #f9fafb; cursor: pointer; font-family: inherit; font-size: .8rem; font-weight: 600; color: #4b5563; white-space: nowrap; transition: background .15s; }
+    .sort-btn.dark { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    .sort-dropdown { position: absolute; right: 0; top: calc(100% + 6px); min-width: 168px; border-radius: 14px; border: 1px solid #f0f0f0; background: #fff; box-shadow: 0 8px 32px rgba(0,0,0,.12); z-index: 30; overflow: hidden; }
+    .sort-dropdown.dark { background: #1f2937; border-color: #374151; }
+    .sort-option { display: block; width: 100%; text-align: left; padding: 10px 16px; border: none; background: transparent; cursor: pointer; font-family: inherit; font-size: .82rem; color: #374151; transition: background .1s; }
+    .sort-option:hover { background: #f9fafb; }
+    .sort-option.dark { color: #d1d5db; }
+    .sort-option.dark:hover { background: #374151; }
+    .sort-option.active { color: #fff; }
+
+    /* ── Section heading ── */
+    .section-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 14px; }
+    .section-title { font-size: 1.1rem; font-weight: 900; display: flex; align-items: center; gap: 8px; }
+    .section-count { font-size: .75rem; color: #9ca3af; }
+
+    /* ── Movie list ── */
+    .movie-list { display: flex; flex-direction: column; gap: 10px; }
+    .empty-state { text-align: center; padding: 60px 20px; border-radius: 24px; border: 2px dashed #e5e7eb; }
+    .empty-state.dark { border-color: #1f2937; color: #6b7280; }
+    .empty-state svg { margin: 0 auto 14px; opacity: .3; }
+
+    .movie-card { background: #fff; border: 1px solid #f0f0f0; border-radius: 18px; padding: 14px 16px; display: flex; align-items: center; justify-content: space-between; transition: box-shadow .2s, background .3s, border .3s; }
+    .movie-card:hover { box-shadow: 0 4px 16px rgba(0,0,0,.08); }
+    .movie-card.dark { background: #111827; border-color: #1f2937; }
+    .movie-card.dark:hover { border-color: #374151; }
+    .movie-card-left { display: flex; align-items: center; gap: 12px; flex: 1; min-width: 0; }
+    .movie-avatar { width: 44px; height: 44px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-weight: 900; font-size: 1.1rem; color: #fff; flex-shrink: 0; box-shadow: 0 2px 8px rgba(0,0,0,.2); }
+    .movie-title { font-weight: 800; font-size: .95rem; line-height: 1.3; }
+    .movie-meta { display: flex; align-items: center; gap: 8px; margin-top: 4px; flex-wrap: wrap; }
+    .genre-badge { font-size: .68rem; font-weight: 700; padding: 3px 9px; border-radius: 999px; }
+    .movie-actions { display: flex; gap: 4px; opacity: 0; transition: opacity .2s; flex-shrink: 0; }
+    .movie-card:hover .movie-actions { opacity: 1; }
+    .action-btn { background: transparent; border: none; cursor: pointer; padding: 7px; border-radius: 999px; display: flex; align-items: center; color: #9ca3af; transition: background .15s, color .15s; }
+    .action-btn.edit:hover { background: #eff6ff; color: #3b82f6; }
+    .action-btn.edit.dark:hover { background: #1e3a5f; color: #60a5fa; }
+    .action-btn.del:hover { background: #fef2f2; color: #ef4444; }
+    .action-btn.del.dark:hover { background: #450a0a; color: #f87171; }
+
+    /* ── Inline edit ── */
+    .inline-edit { display: flex; align-items: center; gap: 10px; flex: 1; flex-wrap: wrap; }
+    .inline-input { font-family: inherit; font-size: .9rem; font-weight: 700; padding: 6px 12px; border-radius: 10px; border: 1px solid #e5e7eb; outline: none; flex: 1; min-width: 120px; }
+    .inline-input.dark { background: #1f2937; border-color: #374151; color: #fff; }
+    .inline-select { font-family: inherit; font-size: .82rem; padding: 6px 10px; border-radius: 10px; border: 1px solid #e5e7eb; outline: none; }
+    .inline-select.dark { background: #1f2937; border-color: #374151; color: #d1d5db; }
+    .confirm-btn { border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #fff; display: flex; align-items: center; }
+    .cancel-inline { background: #e5e7eb; border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #4b5563; display: flex; align-items: center; }
+    .cancel-inline:hover { background: #d1d5db; }
+
+    /* ── Stars ── */
+    .stars { display: flex; gap: 2px; }
+    .star { cursor: default; transition: transform .1s; }
+    .star.interactive { cursor: pointer; }
+    .star.interactive:hover { transform: scale(1.25); }
+
+    /* ── Modal overlay ── */
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,.6); backdrop-filter: blur(4px); display: flex; align-items: center; justify-content: center; padding: 24px; z-index: 50; }
+    .modal { width: 100%; max-width: 440px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; }
+    .modal-header { padding: 24px; color: #fff; }
+    .modal-header h2 { font-size: 1.15rem; font-weight: 900; }
+    .modal-header p { font-size: .8rem; opacity: .75; margin-top: 2px; }
+    .modal-body { padding: 24px; }
+    .modal-body.dark { background: #111827; }
+    .form-group { margin-bottom: 20px; }
+    .form-label { display: block; font-size: .82rem; font-weight: 700; margin-bottom: 8px; }
+    .form-label.dark { color: #d1d5db; }
+    .form-input { width: 100%; padding: 12px 16px; border-radius: 12px; border: 1px solid #e5e7eb; font-family: inherit; font-size: .88rem; outline: none; transition: border .2s; }
+    .form-input:focus { border-color: #a5b4fc; box-shadow: 0 0 0 3px rgba(165,180,252,.2); }
+    .form-input.dark { background: #1f2937; border-color: #374151; color: #fff; }
+    .form-input.dark::placeholder { color: #6b7280; }
+    .form-input.dark:focus { border-color: #6366f1; }
+    .genre-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+    .genre-btn { border: 1px solid #e5e7eb; background: #fff; font-family: inherit; font-size: .8rem; font-weight: 600; padding: 9px; border-radius: 12px; cursor: pointer; transition: all .15s; }
+    .genre-btn:hover { border-color: #d1d5db; }
+    .genre-btn.dark { background: #1f2937; color: #9ca3af; border-color: #374151; }
+    .genre-btn.dark:hover { border-color: #6b7280; }
+    .genre-btn.selected { color: #fff; border-color: transparent; }
+    .rating-box { border-radius: 12px; padding: 16px; display: flex; justify-content: center; }
+    .rating-box.light { background: #f9fafb; }
+    .rating-box.dark { background: #1f2937; }
+    .modal-actions { display: flex; gap: 10px; }
+
+    /* ── AI Panel ── */
+    .ai-modal { width: 100%; max-width: 520px; border-radius: 24px; box-shadow: 0 20px 60px rgba(0,0,0,.3); overflow: hidden; max-height: 85vh; display: flex; flex-direction: column; }
+    .ai-body { flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 10px; }
+    .ai-body.dark { background: #111827; }
+    .spinner-wrap { text-align: center; padding: 48px 0; }
+    .spinner { width: 40px; height: 40px; border: 4px solid #e5e7eb; border-top-color: transparent; border-radius: 50%; animation: spin .7s linear infinite; margin: 0 auto 14px; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .spinner-text { font-size: .83rem; color: #9ca3af; }
+    .error-msg { text-align: center; padding: 32px 0; color: #ef4444; }
+    .rec-card { border-radius: 16px; border: 1px solid #f0f0f0; padding: 14px; display: flex; align-items: flex-start; gap: 12px; background: #f9fafb; }
+    .rec-card.dark { background: #1f2937; border-color: #374151; }
+    .rec-info { flex: 1; min-width: 0; }
+    .rec-title-row { display: flex; align-items: center; justify-content: space-between; gap: 8px; flex-wrap: wrap; margin-bottom: 4px; }
+    .rec-title { font-weight: 800; font-size: .88rem; }
+    .rec-year { font-size: .72rem; font-weight: 400; color: #9ca3af; }
+    .rec-reason { font-size: .76rem; color: #6b7280; line-height: 1.4; }
+    .rec-reason.dark { color: #9ca3af; }
+    .add-rec-btn { flex-shrink: 0; border: none; cursor: pointer; padding: 7px; border-radius: 999px; color: #fff; display: flex; align-items: center; transition: opacity .15s; }
+    .add-rec-btn:hover { opacity: .85; }
+    .add-rec-btn.added { background: #dcfce7 !important; color: #16a34a; cursor: default; }
+    .refresh-btn { width: 100%; padding: 10px; border-radius: 12px; border: 1px solid #e5e7eb; background: transparent; font-family: inherit; font-size: .82rem; font-weight: 600; color: #6b7280; cursor: pointer; margin-top: 4px; }
+    .refresh-btn:hover { background: #f9fafb; }
+    .refresh-btn.dark { border-color: #374151; color: #9ca3af; }
+    .refresh-btn.dark:hover { background: #1f2937; }
+
+    /* ── Footer ── */
+    .footer { text-align: center; padding: 32px 20px; font-size: .72rem; color: #9ca3af; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+    .footer-row { display: flex; align-items: center; gap: 6px; }
+
+    /* ── Color themes ── */
+    /* Action */
+    .t-Action-bg   { background: #dc2626; }
+    .t-Action-text { color: #dc2626; }
+    .t-Action-badge-light { background: #fef2f2; color: #dc2626; }
+    .t-Action-badge-dark  { background: rgba(153,27,27,.3); color: #f87171; }
+    /* Comedy */
+    .t-Comedy-bg   { background: #eab308; }
+    .t-Comedy-text { color: #ca8a04; }
+    .t-Comedy-badge-light { background: #fefce8; color: #ca8a04; }
+    .t-Comedy-badge-dark  { background: rgba(113,63,18,.3); color: #fbbf24; }
+    /* Drama */
+    .t-Drama-bg   { background: #1d4ed8; }
+    .t-Drama-text { color: #1d4ed8; }
+    .t-Drama-badge-light { background: #eff6ff; color: #1d4ed8; }
+    .t-Drama-badge-dark  { background: rgba(30,58,138,.3); color: #60a5fa; }
+    /* Sci-Fi */
+    .t-SciFi-bg   { background: #9333ea; }
+    .t-SciFi-text { color: #9333ea; }
+    .t-SciFi-badge-light { background: #faf5ff; color: #9333ea; }
+    .t-SciFi-badge-dark  { background: rgba(88,28,135,.3); color: #c084fc; }
+    /* Horror */
+    .t-Horror-bg   { background: #111827; }
+    .t-Horror-text { color: #374151; }
+    .t-Horror-badge-light { background: #f3f4f6; color: #374151; }
+    .t-Horror-badge-dark  { background: rgba(17,24,39,.5); color: #9ca3af; }
+    /* Romance */
+    .t-Romance-bg   { background: #ec4899; }
+    .t-Romance-text { color: #ec4899; }
+    .t-Romance-badge-light { background: #fdf2f8; color: #ec4899; }
+    .t-Romance-badge-dark  { background: rgba(131,24,67,.3); color: #f472b6; }
+    /* Default */
+    .t-Default-bg   { background: #4f46e5; }
+    .t-Default-text { color: #4f46e5; }
+    .t-Default-badge-light { background: #eef2ff; color: #4f46e5; }
+    .t-Default-badge-dark  { background: rgba(55,48,163,.3); color: #818cf8; }
+
+    /* App backgrounds per top genre */
+    .app-bg-Action  { background: #fff5f5; }
+    .app-bg-Comedy  { background: #fefce8; }
+    .app-bg-Drama   { background: #eff6ff; }
+    .app-bg-SciFi   { background: #faf5ff; }
+    .app-bg-Horror  { background: #f9fafb; }
+    .app-bg-Romance { background: #fdf2f8; }
+    .app-bg-Default { background: #eef2ff; }
+    .app-bg-dark    { background: #030712; color: #f9fafb; }
+
+    @media (max-width: 600px) {
+      .stats-grid { grid-template-columns: 1fr 1fr; }
+      .stats-grid .stat-card:last-child { grid-column: span 2; }
+      .header-actions { gap: 6px; }
+    }
+  </style>
+</head>
+<body>
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useMemo } = React;
+
+const GENRE_INFO = {
+  Action:  { key: 'Action',  avatarBg: '#dc2626' },
+  Comedy:  { key: 'Comedy',  avatarBg: '#eab308' },
+  Drama:   { key: 'Drama',   avatarBg: '#1d4ed8' },
+  'Sci-Fi':{ key: 'SciFi',   avatarBg: '#9333ea' },
+  Horror:  { key: 'Horror',  avatarBg: '#111827' },
+  Romance: { key: 'Romance', avatarBg: '#ec4899' },
+  Default: { key: 'Default', avatarBg: '#4f46e5' },
+};
+
+const GENRES = ['Action', 'Comedy', 'Drama', 'Sci-Fi', 'Horror', 'Romance'];
+const SORT_OPTIONS = [
+  { value: 'newest',      label: 'Newest First' },
+  { value: 'oldest',      label: 'Oldest First' },
+  { value: 'rating_desc', label: 'Highest Rated' },
+  { value: 'rating_asc',  label: 'Lowest Rated' },
+  { value: 'title_asc',   label: 'Title A–Z' },
+  { value: 'title_desc',  label: 'Title Z–A' },
+];
+
+const INITIAL_MOVIES = [
+  { id: 1, title: 'Inception',       genre: 'Sci-Fi',  rating: 5, addedAt: Date.now() - 3000 },
+  { id: 2, title: 'The Dark Knight', genre: 'Action',  rating: 5, addedAt: Date.now() - 2000 },
+  { id: 3, title: 'Superbad',        genre: 'Comedy',  rating: 4, addedAt: Date.now() - 1000 },
+];
+
+function themeKey(genre) {
+  return (GENRE_INFO[genre] || GENRE_INFO.Default).key;
+}
+
+/* ── Inline SVG icons ── */
+const Icon = ({ d, size = 16, strokeWidth = 2, fill = 'none', style = {} }) => (
+  <svg width={size} height={size} viewBox="0 0 24 24" fill={fill} stroke="currentColor"
+    strokeWidth={strokeWidth} strokeLinecap="round" strokeLinejoin="round" style={{ flexShrink: 0, ...style }}>
+    {Array.isArray(d) ? d.map((p, i) => <path key={i} d={p} />) : <path d={d} />}
+  </svg>
+);
+
+const Icons = {
+  Clapperboard: () => <Icon size={26} d={["M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z","m6.2 5.3 3.1 3.9","m12.4 3.4 3.1 3.8","M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"]} />,
+  Film: ({ size = 18 }) => <Icon size={size} d={["M7 2h10","M7 2v4m10-4v4","M7 22v-4m10 4v-4","M3 6h18","M3 18h18","M3 10h18","M3 14h18"]} />,
+  Star: ({ size = 16, filled = false }) => <Icon size={size} d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z" fill={filled ? 'currentColor' : 'none'} />,
+  TrendingUp: () => <Icon d="M22 7 13.5 15.5l-5-5L2 17M22 7h-5M22 7v5" />,
+  History: () => <Icon d={["M3 12a9 9 0 1 0 9-9 9.75 9.75 0 0 0-6.74 2.74L3 8","M3 3v5h5","M12 7v5l4 2"]} />,
+  Search: () => <Icon d="M21 21l-4.35-4.35M17 11A6 6 0 1 1 5 11a6 6 0 0 1 12 0z" />,
+  Sliders: () => <Icon d={["M4 21v-7","M4 10V3","M12 21v-9","M12 8V3","M20 21v-5","M20 12V3","M1 14h6","M9 8h6","M17 16h6"]} />,
+  Sparkles: ({ size = 16 }) => <Icon size={size} d={["M12 3l1.88 5.76L20 10l-6.12 1.24L12 17l-1.88-5.76L4 10l6.12-1.24Z","M5 3v4","M19 17v4","M3 5h4","M17 19h4"]} />,
+  X: ({ size = 18 }) => <Icon size={size} d="M18 6 6 18M6 6l12 12" />,
+  Moon: () => <Icon d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z" />,
+  Sun: () => <Icon d={["M12 1v2M12 21v2M4.22 4.22l1.42 1.42M18.36 18.36l1.42 1.42M1 12h2M21 12h2M4.22 19.78l1.42-1.42M18.36 5.64l1.42-1.42","M12 17A5 5 0 1 0 12 7a5 5 0 0 0 0 10z"]} />,
+  ChevronDown: () => <Icon d="M6 9l6 6 6-6" />,
+  Edit2: () => <Icon d={["M17 3a2.85 2.83 0 1 1 4 4L7.5 20.5 2 22l1.5-5.5Z"]} />,
+  Check: ({ size = 16 }) => <Icon size={size} d="M20 6 9 17l-5-5" />,
+  Trash2: () => <Icon d={["M3 6h18","M19 6v14c0 1-1 2-2 2H7c-1 0-2-1-2-2V6","M8 6V4c0-1 1-2 2-2h4c1 0 2 1 2 2v2","M10 11v6","M14 11v6"]} />,
+  Plus: ({ size = 16 }) => <Icon size={size} d="M12 5v14M5 12h14" />,
+  Info: () => <Icon size={13} d={["M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z","M12 16v-4","M12 8h.01"]} />,
+};
+
+/* ── StarRating ── */
+function StarRating({ rating, interactive = false, onRate = () => {}, size = 16 }) {
+  const [hovered, setHovered] = useState(0);
+  const active = interactive ? (hovered || rating) : rating;
+  return (
+    <div className="stars">
+      {[1, 2, 3, 4, 5].map(s => (
+        <span
+          key={s}
+          className={`star ${interactive ? 'interactive' : ''}`}
+          style={{ color: s <= active ? '#facc15' : '#d1d5db' }}
+          onClick={() => interactive && onRate(s)}
+          onMouseEnter={() => interactive && setHovered(s)}
+          onMouseLeave={() => interactive && setHovered(0)}
+        >
+          <Icons.Star size={size} filled={s <= active} />
+        </span>
+      ))}
+    </div>
+  );
+}
+
+/* ── Main App ── */
+function App() {
+  const [movies, setMovies] = useState(() => {
+    try { const s = localStorage.getItem('cinestar_movies'); return s ? JSON.parse(s) : INITIAL_MOVIES; }
+    catch { return INITIAL_MOVIES; }
+  });
+  const [dark, setDark] = useState(() => {
+    try { return localStorage.getItem('cinestar_dark') === 'true'; } catch { return false; }
+  });
+  const [search, setSearch] = useState('');
+  const [filterGenre, setFilterGenre] = useState('All');
+  const [sortBy, setSortBy] = useState('newest');
+  const [showAdd, setShowAdd] = useState(false);
+  const [newMovie, setNewMovie] = useState({ title: '', genre: 'Action', rating: 3 });
+  const [editingId, setEditingId] = useState(null);
+  const [editData, setEditData] = useState({});
+  const [aiOpen, setAiOpen] = useState(false);
+  const [aiLoading, setAiLoading] = useState(false);
+  const [aiRecs, setAiRecs] = useState([]);
+  const [aiError, setAiError] = useState('');
+  const [sortOpen, setSortOpen] = useState(false);
+
+  useEffect(() => { try { localStorage.setItem('cinestar_movies', JSON.stringify(movies)); } catch {} }, [movies]);
+  useEffect(() => { try { localStorage.setItem('cinestar_dark', dark); } catch {} }, [dark]);
+
+  const topGenre = useMemo(() => {
+    if (!movies.length) return 'Default';
+    const c = movies.reduce((a, m) => { a[m.genre] = (a[m.genre] || 0) + 1; return a; }, {});
+    return Object.keys(c).reduce((a, b) => c[a] > c[b] ? a : b);
+  }, [movies]);
+
+  const tk = themeKey(topGenre);
+
+  const filtered = useMemo(() => {
+    let list = [...movies];
+    if (search.trim()) list = list.filter(m => m.title.toLowerCase().includes(search.toLowerCase()));
+    if (filterGenre !== 'All') list = list.filter(m => m.genre === filterGenre);
+    switch (sortBy) {
+      case 'newest':      list.sort((a, b) => b.addedAt - a.addedAt); break;
+      case 'oldest':      list.sort((a, b) => a.addedAt - b.addedAt); break;
+      case 'rating_desc': list.sort((a, b) => b.rating - a.rating); break;
+      case 'rating_asc':  list.sort((a, b) => a.rating - b.rating); break;
+      case 'title_asc':   list.sort((a, b) => a.title.localeCompare(b.title)); break;
+      case 'title_desc':  list.sort((a, b) => b.title.localeCompare(a.title)); break;
+    }
+    return list;
+  }, [movies, search, filterGenre, sortBy]);
+
+  const avgRating = movies.length
+    ? (movies.reduce((a, m) => a + m.rating, 0) / movies.length).toFixed(1)
+    : '0.0';
+
+  const addMovie = () => {
+    if (!newMovie.title.trim()) return;
+    setMovies([{ ...newMovie, id: Date.now(), addedAt: Date.now() }, ...movies]);
+    setNewMovie({ title: '', genre: 'Action', rating: 3 });
+    setShowAdd(false);
+  };
+
+  const deleteMovie = id => setMovies(movies.filter(m => m.id !== id));
+
+  const startEdit = movie => {
+    setEditingId(movie.id);
+    setEditData({ title: movie.title, genre: movie.genre, rating: movie.rating });
+  };
+  const saveEdit = id => {
+    setMovies(movies.map(m => m.id === id ? { ...m, ...editData } : m));
+    setEditingId(null);
+  };
+
+  const getAiRecs = async () => {
+    setAiLoading(true); setAiError(''); setAiRecs([]);
+    try {
+      const list = movies.map(m => `"${m.title}" (${m.genre}, ${m.rating}/5 stars)`).join(', ');
+      const prompt = `Based on this movie watch history: ${list}\n\nRecommend exactly 5 movies the user would enjoy.\n\nRespond ONLY with a valid JSON array, no markdown, no extra text. Format:\n[{"title":"Movie Name","genre":"Genre","reason":"One sentence why they'd love it","year":2020}]`;
+      const res = await fetch('https://api.anthropic.com/v1/messages', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model: 'claude-sonnet-4-20250514', max_tokens: 1000, messages: [{ role: 'user', content: prompt }] }),
+      });
+      const data = await res.json();
+      const text = data.content?.map(c => c.text || '').join('');
+      const clean = text.replace(/```json|```/g, '').trim();
+      setAiRecs(JSON.parse(clean));
+    } catch { setAiError('Could not fetch recommendations. Please try again.'); }
+    setAiLoading(false);
+  };
+
+  const addRec = rec => {
+    if (movies.some(m => m.title.toLowerCase() === rec.title.toLowerCase())) return;
+    setMovies([{ id: Date.now(), title: rec.title, genre: rec.genre, rating: 3, addedAt: Date.now() }, ...movies]);
+  };
+
+  const appBgClass = dark ? 'app-bg-dark' : `app-bg-${tk}`;
+
+  return (
+    <div className={`app ${appBgClass}`} style={{ color: dark ? '#f9fafb' : '#111827' }}>
+
+      {/* Header */}
+      <header className={`header t-${tk}-bg`}>
+        <div className="container">
+          <div className="header-inner">
+            <div className="logo">
+              <div className="logo-icon"><Icons.Clapperboard /></div>
+              <div><h1>CineStar</h1><p>Your cinematic universe</p></div>
+            </div>
+            <div className="header-actions">
+              <button className="btn btn-icon" onClick={() => setDark(!dark)} title="Toggle dark mode">
+                {dark ? <Icons.Sun /> : <Icons.Moon />}
+              </button>
+              <button className="btn btn-ghost" onClick={() => { setAiOpen(true); getAiRecs(); }}>
+                <Icons.Sparkles size={15} /> AI Picks
+              </button>
+              <button className="btn btn-primary-white" onClick={() => setShowAdd(true)}>
+                <Icons.Plus size={15} /> Add Movie
+              </button>
+            </div>
+          </div>
+        </div>
+      </header>
+
+      <main className="container" style={{ paddingBottom: 60 }}>
+
+        {/* Stats */}
+        <div className="stats-grid">
+          {[
+            { icon: <Icons.Film />, label: 'Watched',    value: movies.length,  colorClass: `t-${tk}-text` },
+            { icon: <Icons.TrendingUp />, label: 'Top Genre', value: topGenre,  colorClass: `t-${tk}-text` },
+            { icon: <Icons.Star size={18} filled />, label: 'Avg Rating', value: avgRating, colorClass: 'text-yellow' },
+          ].map(({ icon, label, value, colorClass }) => (
+            <div key={label} className={`stat-card ${dark ? 'dark' : ''}`}>
+              <div className="stat-label">
+                <span className={colorClass} style={{ color: colorClass === 'text-yellow' ? '#eab308' : undefined }}>
+                  {icon}
+                </span>
+                {label}
+              </div>
+              <div className="stat-value">{value}</div>
+            </div>
+          ))}
+        </div>
+
+        {/* Toolbar */}
+        <div className={`toolbar ${dark ? 'dark' : ''}`}>
+          <div className={`search-box ${dark ? 'dark' : ''}`} style={{ color: dark ? '#f9fafb' : '#111827' }}>
+            <span style={{ color: '#9ca3af' }}><Icons.Search /></span>
+            <input
+              placeholder="Search movies…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+            />
+            {search && (
+              <button onClick={() => setSearch('')} style={{ background: 'none', border: 'none', cursor: 'pointer', color: '#9ca3af', display: 'flex' }}>
+                <Icons.X size={14} />
+              </button>
+            )}
+          </div>
+
+          <div className="genre-pills">
+            {['All', ...GENRES].map(g => {
+              const isActive = filterGenre === g;
+              return (
+                <button
+                  key={g}
+                  className={`pill ${isActive ? `t-${tk}-bg` : `inactive ${dark ? 'dark' : ''}`}`}
+                  style={isActive ? { color: '#fff' } : {}}
+                  onClick={() => setFilterGenre(g)}
+                >{g}</button>
+              );
+            })}
+          </div>
+
+          <div className="sort-wrap">
+            <button className={`sort-btn ${dark ? 'dark' : ''}`} onClick={() => setSortOpen(!sortOpen)}>
+              <Icons.Sliders /> {SORT_OPTIONS.find(o => o.value === sortBy)?.label} <Icons.ChevronDown />
+            </button>
+            {sortOpen && (
+              <div className={`sort-dropdown ${dark ? 'dark' : ''}`}>
+                {SORT_OPTIONS.map(opt => (
+                  <button
+                    key={opt.value}
+                    className={`sort-option ${dark ? 'dark' : ''} ${sortBy === opt.value ? `active t-${tk}-bg` : ''}`}
+                    style={sortBy === opt.value ? { color: '#fff' } : {}}
+                    onClick={() => { setSortBy(opt.value); setSortOpen(false); }}
+                  >{opt.label}</button>
+                ))}
+              </div>
+            )}
+          </div>
+        </div>
+
+        {/* Section heading */}
+        <div className="section-header">
+          <h2 className="section-title"><Icons.History /> Watch History</h2>
+          <span className="section-count">{filtered.length} of {movies.length} films</span>
+        </div>
+
+        {/* Movie list */}
+        <div className="movie-list">
+          {filtered.length === 0 ? (
+            <div className={`empty-state ${dark ? 'dark' : ''}`}>
+              <Icons.Film size={40} />
+              <p style={{ fontWeight: 600 }}>No movies match your search.</p>
+            </div>
+          ) : filtered.map(movie => {
+            const gtk = themeKey(movie.genre);
+            const avatarBg = (GENRE_INFO[movie.genre] || GENRE_INFO.Default).avatarBg;
+            const badgeClass = dark ? `t-${gtk}-badge-dark` : `t-${gtk}-badge-light`;
+            return (
+              <div key={movie.id} className={`movie-card ${dark ? 'dark' : ''}`}>
+                {editingId === movie.id ? (
+                  <div className="inline-edit" style={{ flex: 1 }}>
+                    <input
+                      className={`inline-input ${dark ? 'dark' : ''}`}
+                      value={editData.title}
+                      onChange={e => setEditData({ ...editData, title: e.target.value })}
+                      autoFocus
+                    />
+                    <select
+                      className={`inline-select ${dark ? 'dark' : ''}`}
+                      value={editData.genre}
+                      onChange={e => setEditData({ ...editData, genre: e.target.value })}
+                    >
+                      {GENRES.map(g => <option key={g}>{g}</option>)}
+                    </select>
+                    <StarRating rating={editData.rating} interactive onRate={v => setEditData({ ...editData, rating: v })} size={20} />
+                    <button className={`confirm-btn t-${tk}-bg`} onClick={() => saveEdit(movie.id)}><Icons.Check size={15} /></button>
+                    <button className="cancel-inline" onClick={() => setEditingId(null)}><Icons.X size={15} /></button>
+                  </div>
+                ) : (
+                  <>
+                    <div className="movie-card-left">
+                      <div className="movie-avatar" style={{ background: avatarBg }}>
+                        {movie.title.charAt(0)}
+                      </div>
+                      <div>
+                        <div className="movie-title" style={{ color: dark ? '#f9fafb' : '#111827' }}>{movie.title}</div>
+                        <div className="movie-meta">
+                          <span className={`genre-badge ${badgeClass}`}>{movie.genre}</span>
+                          <StarRating rating={movie.rating} />
+                        </div>
+                      </div>
+                    </div>
+                    <div className="movie-actions">
+                      <button className={`action-btn edit ${dark ? 'dark' : ''}`} onClick={() => startEdit(movie)}><Icons.Edit2 /></button>
+                      <button className={`action-btn del ${dark ? 'dark' : ''}`} onClick={() => deleteMovie(movie.id)}><Icons.Trash2 /></button>
+                    </div>
+                  </>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+
+      {/* Add Movie Modal */}
+      {showAdd && (
+        <div className="modal-overlay" onClick={() => setShowAdd(false)}>
+          <div className="modal" onClick={e => e.stopPropagation()}>
+            <div className={`modal-header t-${tk}-bg`}>
+              <h2>New Entry</h2>
+              <p>What have you been watching?</p>
+            </div>
+            <div className={`modal-body ${dark ? 'dark' : ''}`} style={{ background: dark ? '#111827' : '#fff' }}>
+              <div className="form-group">
+                <label className={`form-label ${dark ? 'dark' : ''}`}>Movie Title</label>
+                <input
+                  autoFocus
+                  type="text"
+                  placeholder="e.g. Interstellar"
+                  className={`form-input ${dark ? 'dark' : ''}`}
+                  value={newMovie.title}
+                  onChange={e => setNewMovie({ ...newMovie, title: e.target.value })}
+                  onKeyDown={e => e.key === 'Enter' && addMovie()}
+                />
+              </div>
+              <div className="form-group">
+                <label className={`form-label ${dark ? 'dark' : ''}`}>Genre</label>
+                <div className="genre-grid">
+                  {GENRES.map(g => {
+                    const isSelected = newMovie.genre === g;
+                    const gtk = themeKey(g);
+                    return (
+                      <button
+                        key={g}
+                        className={`genre-btn ${dark ? 'dark' : ''} ${isSelected ? `selected t-${gtk}-bg` : ''}`}
+                        onClick={() => setNewMovie({ ...newMovie, genre: g })}
+                      >{g}</button>
+                    );
+                  })}
+                </div>
+              </div>
+              <div className="form-group">
+                <label className={`form-label ${dark ? 'dark' : ''}`}>Your Rating</label>
+                <div className={`rating-box ${dark ? 'dark' : 'light'}`}>
+                  <StarRating rating={newMovie.rating} interactive onRate={v => setNewMovie({ ...newMovie, rating: v })} size={28} />
+                </div>
+              </div>
+              <div className="modal-actions">
+                <button className={`btn btn-cancel ${dark ? 'dark' : ''}`} onClick={() => setShowAdd(false)}>Cancel</button>
+                <button className={`btn btn-solid t-${tk}-bg`} onClick={addMovie}>Save Movie</button>
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* AI Panel */}
+      {aiOpen && (
+        <div className="modal-overlay" onClick={() => setAiOpen(false)}>
+          <div className="ai-modal" onClick={e => e.stopPropagation()}>
+            <div className={`modal-header t-${tk}-bg`} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
+              <div>
+                <h2 style={{ display: 'flex', alignItems: 'center', gap: 8 }}><Icons.Sparkles size={18} /> AI Recommendations</h2>
+                <p>Tailored to your taste</p>
+              </div>
+              <button onClick={() => setAiOpen(false)} style={{ background: 'rgba(255,255,255,.2)', border: 'none', cursor: 'pointer', color: '#fff', padding: 6, borderRadius: 999, display: 'flex' }}>
+                <Icons.X size={17} />
+              </button>
+            </div>
+            <div className={`ai-body ${dark ? 'dark' : ''}`} style={{ background: dark ? '#111827' : '#fff' }}>
+              {aiLoading && (
+                <div className="spinner-wrap">
+                  <div className="spinner" style={{ borderColor: `#e5e7eb`, borderTopColor: 'transparent' }}></div>
+                  <p className="spinner-text">Analyzing your taste…</p>
+                </div>
+              )}
+              {aiError && (
+                <div className="error-msg">
+                  <p>{aiError}</p>
+                  <button className={`btn btn-solid t-${tk}-bg`} style={{ width: 'auto', marginTop: 12, padding: '8px 20px' }} onClick={getAiRecs}>Retry</button>
+                </div>
+              )}
+              {!aiLoading && aiRecs.map((rec, i) => {
+                const gtk = themeKey(rec.genre);
+                const avatarBg = (GENRE_INFO[rec.genre] || GENRE_INFO.Default).avatarBg;
+                const badgeClass = dark ? `t-${gtk}-badge-dark` : `t-${gtk}-badge-light`;
+                const alreadyAdded = movies.some(m => m.title.toLowerCase() === rec.title.toLowerCase());
+                return (
+                  <div key={i} className={`rec-card ${dark ? 'dark' : ''}`}>
+                    <div className="movie-avatar" style={{ background: avatarBg, width: 40, height: 40 }}>{rec.title.charAt(0)}</div>
+                    <div className="rec-info">
+                      <div className="rec-title-row">
+                        <span className="rec-title" style={{ color: dark ? '#f9fafb' : '#111827' }}>
+                          {rec.title} {rec.year && <span className="rec-year">({rec.year})</span>}
+                        </span>
+                        <span className={`genre-badge ${badgeClass}`}>{rec.genre}</span>
+                      </div>
+                      <p className={`rec-reason ${dark ? 'dark' : ''}`}>{rec.reason}</p>
+                    </div>
+                    <button
+                      className={`add-rec-btn ${alreadyAdded ? 'added' : `t-${tk}-bg`}`}
+                      onClick={() => !alreadyAdded && addRec(rec)}
+                      disabled={alreadyAdded}
+                      title={alreadyAdded ? 'Already in list' : 'Add to list'}
+                    >
+                      {alreadyAdded ? <Icons.Check size={15} /> : <Icons.Plus size={15} />}
+                    </button>
+                  </div>
+                );
+              })}
+              {!aiLoading && aiRecs.length > 0 && (
+                <button className={`refresh-btn ${dark ? 'dark' : ''}`} onClick={getAiRecs}>Refresh Recommendations</button>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Close sort on outside click */}
+      {sortOpen && <div style={{ position: 'fixed', inset: 0, zIndex: 10 }} onClick={() => setSortOpen(false)} />}
+
+      <footer className="footer">
+        <div className="footer-row"><Icons.Info /> Theme adapts to your most-watched genre · Data saved locally</div>
+        <div>© 2025 CineStar</div>
+      </footer>
+    </div>
+  );
+}
+
+const root = ReactDOM.createRoot(document.getElementById('root'));
+root.render(<App />);
+</script>
+</body>
+</html>
