@@ -1,0 +1,1020 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>🌟 Pesach Adventure! 🌟</title>
+<link href="https://fonts.googleapis.com/css2?family=Fredoka+One&family=Nunito:wght@400;600;700;800&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --gold: #F4C430;
+    --deep-blue: #1a3a5c;
+    --warm-red: #C0392B;
+    --sky: #5DADE2;
+    --green: #27AE60;
+    --cream: #FDF6E3;
+    --orange: #E67E22;
+    --purple: #8E44AD;
+    --bg: #0d2137;
+    --card: #162d45;
+    --card2: #1e3d5a;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Nunito', sans-serif;
+    background: var(--bg);
+    min-height: 100vh;
+    color: white;
+    overflow-x: hidden;
+  }
+
+  /* Stars background */
+  body::before {
+    content: '';
+    position: fixed;
+    inset: 0;
+    background-image:
+      radial-gradient(1px 1px at 10% 20%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 30% 60%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 50% 10%, rgba(255,255,255,0.7) 0%, transparent 100%),
+      radial-gradient(1px 1px at 70% 80%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1px 1px at 85% 35%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 20% 85%, rgba(255,255,255,0.4) 0%, transparent 100%),
+      radial-gradient(1px 1px at 60% 50%, rgba(255,255,255,0.3) 0%, transparent 100%),
+      radial-gradient(1px 1px at 90% 70%, rgba(255,255,255,0.5) 0%, transparent 100%),
+      radial-gradient(1.5px 1.5px at 40% 40%, rgba(255,255,255,0.6) 0%, transparent 100%),
+      radial-gradient(1px 1px at 75% 15%, rgba(255,255,255,0.4) 0%, transparent 100%);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* HEADER */
+  header {
+    text-align: center;
+    padding: 30px 20px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .logo {
+    font-family: 'Fredoka One', cursive;
+    font-size: clamp(2.2rem, 6vw, 4rem);
+    background: linear-gradient(135deg, var(--gold), #ffe066, var(--gold));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+    text-shadow: none;
+    filter: drop-shadow(0 2px 8px rgba(244,196,48,0.4));
+    animation: shimmer 3s ease-in-out infinite;
+  }
+
+  @keyframes shimmer {
+    0%, 100% { filter: drop-shadow(0 2px 8px rgba(244,196,48,0.4)); }
+    50% { filter: drop-shadow(0 2px 20px rgba(244,196,48,0.8)); }
+  }
+
+  .subtitle {
+    color: #a8d4f5;
+    font-size: 1.1rem;
+    margin-top: 6px;
+    font-weight: 600;
+  }
+
+  /* NAVIGATION */
+  nav {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 16px 20px;
+    position: relative;
+    z-index: 1;
+  }
+
+  .nav-btn {
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+    padding: 10px 22px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    letter-spacing: 0.5px;
+  }
+
+  .nav-btn:hover { transform: translateY(-3px) scale(1.05); }
+  .nav-btn:active { transform: scale(0.97); }
+
+  .nav-btn.active {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.4);
+  }
+
+  .btn-home    { background: linear-gradient(135deg, var(--gold), #e6a800); color: var(--deep-blue); }
+  .btn-match   { background: linear-gradient(135deg, var(--sky), #2980b9); color: white; }
+  .btn-quiz    { background: linear-gradient(135deg, var(--green), #1e8449); color: white; }
+  .btn-order   { background: linear-gradient(135deg, var(--orange), #ca6f1e); color: white; }
+  .btn-plague  { background: linear-gradient(135deg, var(--warm-red), #922b21); color: white; }
+
+  /* SCREENS */
+  .screen { display: none; padding: 20px; position: relative; z-index: 1; animation: fadeIn 0.4s ease; }
+  .screen.active { display: block; }
+
+  @keyframes fadeIn { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: translateY(0); } }
+
+  .screen-title {
+    font-family: 'Fredoka One', cursive;
+    font-size: 2rem;
+    text-align: center;
+    margin-bottom: 24px;
+    color: var(--gold);
+  }
+
+  /* HOME SCREEN */
+  .home-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    max-width: 900px;
+    margin: 0 auto;
+  }
+
+  .home-card {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 30px 24px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    border: 2px solid transparent;
+    position: relative;
+    overflow: hidden;
+  }
+
+  .home-card::before {
+    content: '';
+    position: absolute;
+    inset: 0;
+    background: linear-gradient(135deg, rgba(255,255,255,0.04), transparent);
+    border-radius: 22px;
+  }
+
+  .home-card:hover { transform: translateY(-6px); border-color: var(--gold); box-shadow: 0 12px 40px rgba(0,0,0,0.4); }
+
+  .home-card .emoji { font-size: 3.5rem; display: block; margin-bottom: 14px; animation: bob 3s ease-in-out infinite; }
+  @keyframes bob { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+
+  .home-card h3 { font-family: 'Fredoka One', cursive; font-size: 1.5rem; color: var(--gold); margin-bottom: 8px; }
+  .home-card p { font-size: 0.95rem; color: #a8c8e8; line-height: 1.5; }
+
+  .home-intro {
+    text-align: center;
+    max-width: 600px;
+    margin: 0 auto 30px;
+    font-size: 1.1rem;
+    color: #a8d4f5;
+    line-height: 1.7;
+  }
+
+  /* MATCHING GAME */
+  .match-board {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 12px;
+    max-width: 520px;
+    margin: 0 auto 24px;
+  }
+
+  @media (max-width: 500px) { .match-board { grid-template-columns: repeat(3, 1fr); gap: 8px; } }
+
+  .match-card {
+    aspect-ratio: 1;
+    border-radius: 16px;
+    cursor: pointer;
+    position: relative;
+    transform-style: preserve-3d;
+    transition: transform 0.5s ease;
+  }
+
+  .match-card.flipped { transform: rotateY(180deg); }
+
+  .match-card-front, .match-card-back {
+    position: absolute;
+    inset: 0;
+    backface-visibility: hidden;
+    border-radius: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 2rem;
+    border: 3px solid transparent;
+  }
+
+  .match-card-front {
+    background: linear-gradient(135deg, #1e3d5a, #2a5278);
+    border-color: #3a6a9a;
+    font-size: 1.8rem;
+    color: var(--gold);
+    font-family: 'Fredoka One', cursive;
+  }
+
+  .match-card-back {
+    background: linear-gradient(135deg, var(--card2), #234a6e);
+    transform: rotateY(180deg);
+    border-color: #4a8ac4;
+    flex-direction: column;
+    gap: 4px;
+    padding: 6px;
+  }
+
+  .match-card-back .card-label {
+    font-size: 0.6rem;
+    color: #a8d4f5;
+    font-weight: 700;
+    text-align: center;
+    line-height: 1.2;
+  }
+
+  .match-card.matched .match-card-back {
+    border-color: var(--green);
+    background: linear-gradient(135deg, #1a4a2e, #27ae6033);
+  }
+
+  .match-card.matched .match-card-front {
+    border-color: var(--green);
+  }
+
+  .score-bar {
+    display: flex;
+    justify-content: center;
+    gap: 30px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+  }
+
+  .score-item {
+    background: var(--card);
+    border-radius: 50px;
+    padding: 8px 22px;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1rem;
+  }
+
+  .score-item span { color: var(--gold); }
+
+  .game-btn {
+    display: block;
+    margin: 0 auto;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.1rem;
+    padding: 12px 32px;
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    background: linear-gradient(135deg, var(--gold), #e6a800);
+    color: var(--deep-blue);
+    transition: all 0.2s ease;
+  }
+
+  .game-btn:hover { transform: scale(1.05); box-shadow: 0 4px 16px rgba(244,196,48,0.4); }
+
+  /* QUIZ GAME */
+  .quiz-container {
+    max-width: 600px;
+    margin: 0 auto;
+  }
+
+  .progress-bar-outer {
+    background: var(--card);
+    border-radius: 50px;
+    height: 14px;
+    margin-bottom: 24px;
+    overflow: hidden;
+  }
+
+  .progress-bar-inner {
+    height: 100%;
+    border-radius: 50px;
+    background: linear-gradient(90deg, var(--green), #58d68d);
+    transition: width 0.5s ease;
+  }
+
+  .quiz-question {
+    background: var(--card);
+    border-radius: 24px;
+    padding: 28px 24px;
+    text-align: center;
+    margin-bottom: 20px;
+    border: 2px solid #2a5278;
+  }
+
+  .quiz-question .q-emoji { font-size: 3rem; margin-bottom: 12px; display: block; }
+  .quiz-question p { font-size: 1.15rem; font-weight: 700; line-height: 1.5; color: #e0efff; }
+
+  .quiz-options {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-bottom: 20px;
+  }
+
+  .quiz-opt {
+    background: var(--card2);
+    border: 2px solid #2a5278;
+    border-radius: 16px;
+    padding: 16px 12px;
+    font-family: 'Nunito', sans-serif;
+    font-size: 0.95rem;
+    font-weight: 700;
+    color: white;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    text-align: center;
+    line-height: 1.4;
+  }
+
+  .quiz-opt:hover:not(:disabled) { border-color: var(--sky); transform: scale(1.02); background: #244060; }
+  .quiz-opt.correct { background: linear-gradient(135deg, #1a4a2e, #27ae6050); border-color: var(--green); }
+  .quiz-opt.wrong { background: linear-gradient(135deg, #4a1a1a, #c0392b50); border-color: var(--warm-red); }
+
+  .feedback-msg {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.4rem;
+    min-height: 40px;
+    color: var(--gold);
+  }
+
+  .feedback-msg.wrong-fb { color: #e74c3c; }
+
+  /* ORDER GAME */
+  .order-container { max-width: 500px; margin: 0 auto; }
+
+  .order-intro {
+    text-align: center;
+    color: #a8d4f5;
+    margin-bottom: 20px;
+    font-weight: 600;
+  }
+
+  .order-list { display: flex; flex-direction: column; gap: 10px; margin-bottom: 20px; }
+
+  .order-item {
+    background: var(--card2);
+    border: 2px solid #2a5278;
+    border-radius: 16px;
+    padding: 14px 18px;
+    display: flex;
+    align-items: center;
+    gap: 14px;
+    cursor: grab;
+    transition: all 0.2s ease;
+    user-select: none;
+  }
+
+  .order-item:active { cursor: grabbing; }
+  .order-item.dragging { opacity: 0.5; border-color: var(--gold); }
+  .order-item.drag-over { border-color: var(--sky); background: #244060; }
+
+  .order-item .item-emoji { font-size: 1.8rem; flex-shrink: 0; }
+  .order-item .item-text { font-weight: 700; font-size: 0.95rem; }
+  .order-item .drag-handle { margin-left: auto; color: #4a7aaa; font-size: 1.2rem; }
+
+  .order-item.correct-order { border-color: var(--green); }
+  .order-item.wrong-order { border-color: var(--warm-red); }
+
+  /* PLAGUE GAME */
+  .plague-container { max-width: 700px; margin: 0 auto; }
+
+  .plague-intro {
+    text-align: center;
+    color: #a8d4f5;
+    margin-bottom: 24px;
+    font-weight: 600;
+    font-size: 1rem;
+    line-height: 1.6;
+  }
+
+  .plague-grid {
+    display: grid;
+    grid-template-columns: repeat(5, 1fr);
+    gap: 12px;
+    margin-bottom: 24px;
+  }
+
+  @media (max-width: 500px) { .plague-grid { grid-template-columns: repeat(3, 1fr); } }
+
+  .plague-card {
+    background: var(--card2);
+    border: 2px solid #2a5278;
+    border-radius: 18px;
+    padding: 16px 8px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.25s ease;
+    position: relative;
+  }
+
+  .plague-card:hover { border-color: var(--sky); transform: scale(1.04); }
+
+  .plague-card.selected { border-color: var(--gold); background: linear-gradient(135deg, #2a4a1a, #3a5a2a); }
+  .plague-card.correct { border-color: var(--green); background: linear-gradient(135deg, #1a4a2e, #2a6a3e); }
+  .plague-card.wrong { border-color: var(--warm-red); background: linear-gradient(135deg, #4a1a1a, #6a2a2a); animation: shake 0.4s ease; }
+  .plague-card.revealed { border-color: var(--green); background: linear-gradient(135deg, #1a4a2e, #2a6a3e); cursor: default; }
+
+  @keyframes shake { 0%,100% {transform: translateX(0)} 25% {transform: translateX(-6px)} 75% {transform: translateX(6px)} }
+
+  .plague-card .p-emoji { font-size: 2rem; display: block; margin-bottom: 8px; }
+  .plague-card .p-name { font-size: 0.72rem; font-weight: 700; color: #a8d4f5; line-height: 1.3; }
+
+  .plague-score-display {
+    text-align: center;
+    font-family: 'Fredoka One', cursive;
+    font-size: 1.2rem;
+    color: var(--gold);
+    margin-bottom: 16px;
+  }
+
+  /* WIN SCREEN */
+  .win-screen {
+    text-align: center;
+    padding: 40px 20px;
+    animation: popIn 0.5s ease;
+  }
+
+  @keyframes popIn { from {transform: scale(0.7); opacity: 0;} to {transform: scale(1); opacity: 1;} }
+
+  .win-screen .big-emoji { font-size: 5rem; display: block; margin-bottom: 16px; animation: spin 1s ease; }
+  @keyframes spin { from {transform: rotate(-20deg) scale(0.5);} to {transform: rotate(0deg) scale(1);} }
+
+  .win-screen h2 { font-family: 'Fredoka One', cursive; font-size: 2.5rem; color: var(--gold); margin-bottom: 12px; }
+  .win-screen p { color: #a8d4f5; font-size: 1.1rem; margin-bottom: 24px; }
+
+  /* CONFETTI */
+  .confetti-piece {
+    position: fixed;
+    width: 10px;
+    height: 10px;
+    border-radius: 2px;
+    animation: confettiFall linear forwards;
+    pointer-events: none;
+    z-index: 999;
+  }
+
+  @keyframes confettiFall {
+    0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
+    100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+  }
+
+  /* Seder plate decoration */
+  .seder-deco {
+    text-align: center;
+    font-size: 2rem;
+    margin-bottom: 8px;
+    animation: bob 3s ease-in-out infinite;
+  }
+
+  /* Fun fact box */
+  .fun-fact {
+    background: linear-gradient(135deg, #1e3a5a, #162d45);
+    border: 2px solid var(--gold);
+    border-radius: 20px;
+    padding: 18px 22px;
+    margin: 16px auto;
+    max-width: 560px;
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+
+  .fun-fact .ff-icon { font-size: 1.6rem; flex-shrink: 0; }
+  .fun-fact p { font-size: 0.9rem; color: #d4e8ff; line-height: 1.6; }
+  .fun-fact strong { color: var(--gold); }
+
+  .section-label {
+    font-family: 'Fredoka One', cursive;
+    font-size: 0.8rem;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: #5d9fd4;
+    text-align: center;
+    margin-bottom: 8px;
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="logo">🌟 Pesach Adventure! 🌟</div>
+  <div class="subtitle">Learn about Passover through fun games!</div>
+</header>
+
+<nav>
+  <button class="nav-btn btn-home active" onclick="showScreen('home')">🏠 Home</button>
+  <button class="nav-btn btn-match" onclick="showScreen('match')">🃏 Match Game</button>
+  <button class="nav-btn btn-quiz" onclick="showScreen('quiz')">❓ Quiz Time</button>
+  <button class="nav-btn btn-order" onclick="showScreen('order')">📋 Seder Order</button>
+  <button class="nav-btn btn-plague" onclick="showScreen('plague')">🐸 Ten Plagues</button>
+</nav>
+
+<!-- HOME SCREEN -->
+<div id="screen-home" class="screen active">
+  <div class="seder-deco">🕍 🍷 🫓 🌿 🥚</div>
+  <p class="home-intro">
+    Welcome to <strong style="color:var(--gold)">Pesach Adventure</strong>! 🎉<br>
+    Pesach (Passover) is one of the most important Jewish holidays. It celebrates how God freed the Jewish people from slavery in Egypt over 3,000 years ago. Explore the games below to learn all about it!
+  </p>
+  <div class="home-grid">
+    <div class="home-card" onclick="showScreen('match')">
+      <span class="emoji">🃏</span>
+      <h3>Match Game</h3>
+      <p>Match Pesach symbols with their names and meanings! Flip cards to find pairs.</p>
+    </div>
+    <div class="home-card" onclick="showScreen('quiz')">
+      <span class="emoji">❓</span>
+      <h3>Quiz Time</h3>
+      <p>Test your Pesach knowledge with fun questions about the holiday and its traditions!</p>
+    </div>
+    <div class="home-card" onclick="showScreen('order')">
+      <span class="emoji">📋</span>
+      <h3>Seder Order</h3>
+      <p>Can you put the 15 steps of the Passover Seder in the right order? Drag and drop!</p>
+    </div>
+    <div class="home-card" onclick="showScreen('plague')">
+      <span class="emoji">🐸</span>
+      <h3>Ten Plagues</h3>
+      <p>Find all 10 plagues that God sent to Egypt! Can you identify them all?</p>
+    </div>
+  </div>
+  <div class="fun-fact" style="margin-top:28px;">
+    <span class="ff-icon">✡️</span>
+    <p><strong>Did you know?</strong> The word "Pesach" means "to pass over" in Hebrew. It refers to how God passed over the houses of the Jewish people during the last plague in Egypt.</p>
+  </div>
+</div>
+
+<!-- MATCH GAME SCREEN -->
+<div id="screen-match" class="screen">
+  <div class="screen-title">🃏 Symbol Match Game</div>
+  <div class="fun-fact" style="margin-bottom:20px;">
+    <span class="ff-icon">💡</span>
+    <p>Flip cards to find matching pairs! Each symbol is an important part of the Pesach Seder plate or holiday.</p>
+  </div>
+  <div class="score-bar">
+    <div class="score-item">Moves: <span id="match-moves">0</span></div>
+    <div class="score-item">Pairs: <span id="match-pairs">0</span>/8</div>
+  </div>
+  <div class="match-board" id="match-board"></div>
+  <button class="game-btn" onclick="initMatch()">🔄 New Game</button>
+</div>
+
+<!-- QUIZ SCREEN -->
+<div id="screen-quiz" class="screen">
+  <div class="screen-title">❓ Pesach Quiz!</div>
+  <div class="quiz-container">
+    <div class="progress-bar-outer">
+      <div class="progress-bar-inner" id="quiz-progress" style="width:0%"></div>
+    </div>
+    <div class="score-bar">
+      <div class="score-item">Question: <span id="quiz-qnum">1</span>/10</div>
+      <div class="score-item">Score: <span id="quiz-score">0</span></div>
+    </div>
+    <div class="quiz-question">
+      <span class="q-emoji" id="quiz-emoji">🤔</span>
+      <p id="quiz-question-text">Loading question...</p>
+    </div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="feedback-msg" id="quiz-feedback"></div>
+  </div>
+</div>
+
+<!-- SEDER ORDER SCREEN -->
+<div id="screen-order" class="screen">
+  <div class="screen-title">📋 Seder Order Game</div>
+  <p class="order-intro">The Passover Seder has 15 steps called the "Seder". Drag the steps into the correct order!</p>
+  <div class="order-container">
+    <div class="score-bar">
+      <div class="score-item">Correct: <span id="order-score">?</span>/8</div>
+    </div>
+    <div class="order-list" id="order-list"></div>
+    <div style="display:flex; gap:12px; justify-content:center; flex-wrap:wrap;">
+      <button class="game-btn" onclick="checkOrder()" style="background:linear-gradient(135deg,var(--green),#1e8449);color:white;">✅ Check Order</button>
+      <button class="game-btn" onclick="initOrder()">🔄 Shuffle</button>
+    </div>
+  </div>
+</div>
+
+<!-- TEN PLAGUES SCREEN -->
+<div id="screen-plague" class="screen">
+  <div class="screen-title">🐸 Ten Plagues Challenge</div>
+  <div class="plague-container">
+    <p class="plague-intro">
+      God sent 10 plagues to Egypt to free the Jewish people. Can you identify which ones are the real plagues? 
+      <strong style="color:var(--gold)">Click all 10 real plagues!</strong>
+    </p>
+    <div class="plague-score-display">Found: <span id="plague-found">0</span>/10</div>
+    <div class="plague-grid" id="plague-grid"></div>
+    <div id="plague-feedback" style="text-align:center;font-size:1rem;color:#a8d4f5;min-height:40px;font-weight:700;"></div>
+    <button class="game-btn" onclick="initPlague()" style="margin-top:16px;">🔄 Reset</button>
+  </div>
+</div>
+
+<script>
+// ─────────────────────────────────────────────
+// NAVIGATION
+// ─────────────────────────────────────────────
+function showScreen(name) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + name).classList.add('active');
+  document.querySelector('.btn-' + (name === 'home' ? 'home' : name === 'match' ? 'match' : name === 'quiz' ? 'quiz' : name === 'order' ? 'order' : 'plague')).classList.add('active');
+}
+
+// ─────────────────────────────────────────────
+// CONFETTI
+// ─────────────────────────────────────────────
+function launchConfetti(count = 60) {
+  const colors = ['#F4C430','#5DADE2','#27AE60','#E67E22','#E74C3C','#9B59B6','#1ABC9C'];
+  for (let i = 0; i < count; i++) {
+    const el = document.createElement('div');
+    el.className = 'confetti-piece';
+    el.style.left = Math.random() * 100 + 'vw';
+    el.style.top = '-10px';
+    el.style.background = colors[Math.floor(Math.random() * colors.length)];
+    el.style.width = (Math.random() * 8 + 6) + 'px';
+    el.style.height = (Math.random() * 8 + 6) + 'px';
+    el.style.borderRadius = Math.random() > 0.5 ? '50%' : '2px';
+    el.style.animationDuration = (Math.random() * 2 + 2) + 's';
+    el.style.animationDelay = (Math.random() * 1.5) + 's';
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 4000);
+  }
+}
+
+// ─────────────────────────────────────────────
+// MATCHING GAME
+// ─────────────────────────────────────────────
+const matchItems = [
+  { emoji: '🫓', name: 'Matzah', desc: 'Unleavened bread' },
+  { emoji: '🍷', name: 'Kiddush Cup', desc: 'Wine for blessings' },
+  { emoji: '🌿', name: 'Maror', desc: 'Bitter herbs' },
+  { emoji: '🦴', name: 'Zeroa', desc: 'Shank bone' },
+  { emoji: '🥚', name: 'Beitzah', desc: 'Roasted egg' },
+  { emoji: '🍎', name: 'Charoset', desc: 'Apple & nut mix' },
+  { emoji: '🌱', name: 'Karpas', desc: 'Green vegetable' },
+  { emoji: '🏺', name: 'Seder Plate', desc: 'Special dish' },
+];
+
+let matchFlipped = [], matchMatched = 0, matchMoves = 0, matchLocked = false;
+
+function initMatch() {
+  matchFlipped = []; matchMatched = 0; matchMoves = 0; matchLocked = false;
+  document.getElementById('match-moves').textContent = 0;
+  document.getElementById('match-pairs').textContent = 0;
+
+  const cards = [...matchItems, ...matchItems].map((item, i) => ({ ...item, id: i }));
+  for (let i = cards.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [cards[i], cards[j]] = [cards[j], cards[i]];
+  }
+
+  const board = document.getElementById('match-board');
+  board.innerHTML = '';
+  cards.forEach((card, idx) => {
+    const el = document.createElement('div');
+    el.className = 'match-card';
+    el.dataset.emoji = card.emoji;
+    el.dataset.name = card.name;
+    el.innerHTML = `
+      <div class="match-card-front">?</div>
+      <div class="match-card-back">
+        <span>${card.emoji}</span>
+        <span class="card-label">${card.name}</span>
+      </div>`;
+    el.addEventListener('click', () => flipCard(el));
+    board.appendChild(el);
+  });
+}
+
+function flipCard(el) {
+  if (matchLocked || el.classList.contains('flipped') || el.classList.contains('matched')) return;
+  el.classList.add('flipped');
+  matchFlipped.push(el);
+  if (matchFlipped.length === 2) {
+    matchLocked = true;
+    matchMoves++;
+    document.getElementById('match-moves').textContent = matchMoves;
+    const [a, b] = matchFlipped;
+    if (a.dataset.emoji === b.dataset.emoji) {
+      a.classList.add('matched'); b.classList.add('matched');
+      matchMatched++;
+      document.getElementById('match-pairs').textContent = matchMatched;
+      matchFlipped = []; matchLocked = false;
+      if (matchMatched === 8) {
+        setTimeout(() => { launchConfetti(); alert('🎉 Amazing! You found all pairs in ' + matchMoves + ' moves! Chag Sameach! 🎊'); }, 300);
+      }
+    } else {
+      setTimeout(() => {
+        a.classList.remove('flipped'); b.classList.remove('flipped');
+        matchFlipped = []; matchLocked = false;
+      }, 1000);
+    }
+  }
+}
+
+initMatch();
+
+// ─────────────────────────────────────────────
+// QUIZ GAME
+// ─────────────────────────────────────────────
+const quizQuestions = [
+  {
+    emoji: '🏺', q: 'What was the Jewish people doing in Egypt before Pesach?',
+    opts: ['Building pyramids as slaves', 'Living as pharaohs', 'Farming freely', 'Trading spices'],
+    correct: 0, fact: 'The Jewish people were slaves in Egypt, forced to do hard labor.'
+  },
+  {
+    emoji: '👶', q: 'Who was the Jewish baby hidden in a basket in the Nile River?',
+    opts: ['Aaron', 'Moses', 'Joshua', 'David'],
+    correct: 1, fact: 'Moses was placed in a basket on the Nile to save him from Pharaoh\'s decree.'
+  },
+  {
+    emoji: '🔥', q: 'How did God first speak to Moses?',
+    opts: ['A dream', 'A burning bush', 'A rainbow', 'A thunder cloud'],
+    correct: 1, fact: 'God appeared to Moses in a burning bush that was not consumed by the fire!'
+  },
+  {
+    emoji: '🫓', q: 'Why do we eat Matzah on Pesach?',
+    opts: ['It tastes better', 'The bread had no time to rise during the exodus', 'Moses loved it', 'It was Pharaoh\'s bread'],
+    correct: 1, fact: 'When the Jews left Egypt quickly, there was no time for bread to rise, so they ate flat matzah.'
+  },
+  {
+    emoji: '🍷', q: 'How many cups of wine do we drink at the Pesach Seder?',
+    opts: ['One', 'Two', 'Three', 'Four'],
+    correct: 3, fact: 'We drink four cups of wine, each representing one of God\'s four promises of redemption!'
+  },
+  {
+    emoji: '❓', q: 'What is the name of the youngest child\'s part in the Seder?',
+    opts: ['The Four Plagues', 'The Mah Nishtana (Four Questions)', 'The Hallel', 'The Afikoman'],
+    correct: 1, fact: 'The Mah Nishtana asks four questions about why this night is different from all other nights!'
+  },
+  {
+    emoji: '🎭', q: 'What is the "Afikoman"?',
+    opts: ['A special prayer', 'A piece of Matzah hidden for children to find', 'A bitter herb', 'A Pesach song'],
+    correct: 1, fact: 'The Afikoman is a piece of matzah that children traditionally hunt for and "ransom" back to adults!'
+  },
+  {
+    emoji: '🌊', q: 'What sea did Moses part for the Jewish people?',
+    opts: ['The Dead Sea', 'The Mediterranean Sea', 'The Red Sea', 'The Black Sea'],
+    correct: 2, fact: 'Moses parted the Red Sea so the Jewish people could cross to freedom!'
+  },
+  {
+    emoji: '🌿', q: 'What does "Maror" (the bitter herbs) represent?',
+    opts: ['The sweetness of freedom', 'The bitterness of slavery', 'The herbs of Egypt', 'A special spice'],
+    correct: 1, fact: 'Maror (usually horseradish) reminds us of the bitter suffering of slavery in Egypt.'
+  },
+  {
+    emoji: '🌱', q: 'We dip Karpas (parsley) into salt water. What does the salt water represent?',
+    opts: ['The Red Sea', 'The Nile River', 'The tears of the slaves', 'Rain in Egypt'],
+    correct: 2, fact: 'The salt water symbolizes the tears shed by the Jewish slaves in Egypt.'
+  },
+];
+
+let quizIdx = 0, quizScore = 0, quizAnswered = false, quizOrder = [];
+
+function initQuiz() {
+  quizIdx = 0; quizScore = 0; quizAnswered = false;
+  quizOrder = [...Array(quizQuestions.length).keys()].sort(() => Math.random() - 0.5);
+  document.getElementById('quiz-score').textContent = 0;
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = quizQuestions[quizOrder[quizIdx]];
+  quizAnswered = false;
+  document.getElementById('quiz-progress').style.width = (quizIdx / 10 * 100) + '%';
+  document.getElementById('quiz-qnum').textContent = quizIdx + 1;
+  document.getElementById('quiz-emoji').textContent = q.emoji;
+  document.getElementById('quiz-question-text').textContent = q.q;
+  document.getElementById('quiz-feedback').textContent = '';
+  document.getElementById('quiz-feedback').className = 'feedback-msg';
+
+  const opts = document.getElementById('quiz-options');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'quiz-opt';
+    btn.textContent = opt;
+    btn.onclick = () => answerQuiz(i, q, btn);
+    opts.appendChild(btn);
+  });
+}
+
+function answerQuiz(chosen, q, btn) {
+  if (quizAnswered) return;
+  quizAnswered = true;
+  const allBtns = document.querySelectorAll('.quiz-opt');
+  allBtns.forEach(b => b.disabled = true);
+  allBtns[q.correct].classList.add('correct');
+
+  const fb = document.getElementById('quiz-feedback');
+  if (chosen === q.correct) {
+    quizScore++;
+    document.getElementById('quiz-score').textContent = quizScore;
+    fb.textContent = '🌟 Correct! ' + q.fact;
+    fb.className = 'feedback-msg';
+  } else {
+    btn.classList.add('wrong');
+    fb.textContent = '❌ Not quite! ' + q.fact;
+    fb.className = 'feedback-msg wrong-fb';
+  }
+
+  setTimeout(() => {
+    quizIdx++;
+    if (quizIdx < 10) {
+      showQuestion();
+    } else {
+      showQuizEnd();
+    }
+  }, 2200);
+}
+
+function showQuizEnd() {
+  document.getElementById('quiz-progress').style.width = '100%';
+  const stars = quizScore >= 9 ? '🌟🌟🌟' : quizScore >= 7 ? '🌟🌟' : '🌟';
+  const msg = quizScore >= 9 ? 'You\'re a Pesach expert! Chag Sameach! 🎊' : quizScore >= 6 ? 'Great job! You know lots about Pesach!' : 'Keep learning! You\'ll be a Pesach pro soon!';
+  document.querySelector('.quiz-container').innerHTML = `
+    <div class="win-screen">
+      <span class="big-emoji">${quizScore >= 9 ? '🏆' : quizScore >= 6 ? '🌟' : '😊'}</span>
+      <h2>Quiz Complete!</h2>
+      <p>You scored <strong style="color:var(--gold);font-size:1.4rem">${quizScore}/10</strong></p>
+      <p style="font-size:1.3rem;">${stars}</p>
+      <p>${msg}</p>
+      <button class="game-btn" onclick="resetQuiz()">🔄 Play Again</button>
+    </div>`;
+  if (quizScore >= 7) launchConfetti();
+}
+
+function resetQuiz() {
+  document.querySelector('.quiz-container').innerHTML = `
+    <div class="progress-bar-outer"><div class="progress-bar-inner" id="quiz-progress" style="width:0%"></div></div>
+    <div class="score-bar">
+      <div class="score-item">Question: <span id="quiz-qnum">1</span>/10</div>
+      <div class="score-item">Score: <span id="quiz-score">0</span></div>
+    </div>
+    <div class="quiz-question">
+      <span class="q-emoji" id="quiz-emoji">🤔</span>
+      <p id="quiz-question-text">Loading...</p>
+    </div>
+    <div class="quiz-options" id="quiz-options"></div>
+    <div class="feedback-msg" id="quiz-feedback"></div>`;
+  initQuiz();
+}
+
+initQuiz();
+
+// ─────────────────────────────────────────────
+// SEDER ORDER GAME
+// ─────────────────────────────────────────────
+const sederSteps = [
+  { emoji: '🕯️', name: 'Kadesh', desc: 'Recite Kiddush (blessing over wine)', order: 1 },
+  { emoji: '🙌', name: 'Urchatz', desc: 'Wash hands without a blessing', order: 2 },
+  { emoji: '🌱', name: 'Karpas', desc: 'Eat a vegetable dipped in salt water', order: 3 },
+  { emoji: '🫓', name: 'Yachatz', desc: 'Break the middle matzah in two', order: 4 },
+  { emoji: '📖', name: 'Maggid', desc: 'Tell the story of the Exodus', order: 5 },
+  { emoji: '🧼', name: 'Rachtzah', desc: 'Wash hands with a blessing', order: 6 },
+  { emoji: '🙏', name: 'Motzi', desc: 'Say the blessing over matzah', order: 7 },
+  { emoji: '🫓', name: 'Matzah', desc: 'Eat the matzah', order: 8 },
+];
+
+let dragSrc = null;
+
+function initOrder() {
+  const shuffled = [...sederSteps].sort(() => Math.random() - 0.5);
+  const list = document.getElementById('order-list');
+  list.innerHTML = '';
+  document.getElementById('order-score').textContent = '?';
+  shuffled.forEach(step => {
+    const item = document.createElement('div');
+    item.className = 'order-item';
+    item.draggable = true;
+    item.dataset.order = step.order;
+    item.innerHTML = `
+      <span class="item-emoji">${step.emoji}</span>
+      <div>
+        <div class="item-text">${step.name}</div>
+        <div style="font-size:0.78rem;color:#7aadcd;">${step.desc}</div>
+      </div>
+      <span class="drag-handle">⠿</span>`;
+    item.addEventListener('dragstart', e => { dragSrc = item; item.classList.add('dragging'); });
+    item.addEventListener('dragend', e => item.classList.remove('dragging'));
+    item.addEventListener('dragover', e => { e.preventDefault(); item.classList.add('drag-over'); });
+    item.addEventListener('dragleave', e => item.classList.remove('drag-over'));
+    item.addEventListener('drop', e => {
+      e.preventDefault();
+      item.classList.remove('drag-over');
+      if (dragSrc !== item) {
+        const allItems = [...list.querySelectorAll('.order-item')];
+        const fromIdx = allItems.indexOf(dragSrc);
+        const toIdx = allItems.indexOf(item);
+        if (fromIdx < toIdx) list.insertBefore(dragSrc, item.nextSibling);
+        else list.insertBefore(dragSrc, item);
+      }
+    });
+    list.appendChild(item);
+  });
+}
+
+function checkOrder() {
+  const items = document.querySelectorAll('.order-item');
+  let correct = 0;
+  items.forEach((item, i) => {
+    const expected = i + 1;
+    const actual = parseInt(item.dataset.order);
+    item.classList.remove('correct-order', 'wrong-order');
+    if (actual === expected) { item.classList.add('correct-order'); correct++; }
+    else item.classList.add('wrong-order');
+  });
+  document.getElementById('order-score').textContent = correct;
+  if (correct === 8) {
+    launchConfetti();
+    setTimeout(() => alert('🎊 Perfect! You know the Seder order! Chag Sameach!'), 200);
+  }
+}
+
+initOrder();
+
+// ─────────────────────────────────────────────
+// TEN PLAGUES GAME
+// ─────────────────────────────────────────────
+const realPlagues = [
+  { emoji: '🩸', name: 'Blood', real: true },
+  { emoji: '🐸', name: 'Frogs', real: true },
+  { emoji: '🦟', name: 'Lice', real: true },
+  { emoji: '🐛', name: 'Wild Beasts', real: true },
+  { emoji: '🐄', name: 'Livestock Disease', real: true },
+  { emoji: '🤕', name: 'Boils', real: true },
+  { emoji: '⛈️', name: 'Hail', real: true },
+  { emoji: '🦗', name: 'Locusts', real: true },
+  { emoji: '🌑', name: 'Darkness', real: true },
+  { emoji: '😢', name: 'Death of Firstborn', real: true },
+  // Fake plagues
+  { emoji: '🌊', name: 'Floods', real: false },
+  { emoji: '🔥', name: 'Wildfire', real: false },
+  { emoji: '🌪️', name: 'Tornadoes', real: false },
+  { emoji: '🐍', name: 'Serpents', real: false },
+  { emoji: '❄️', name: 'Blizzard', real: false },
+  { emoji: '🦁', name: 'Lions', real: false },
+];
+
+let plagueFound = 0, plagueItems = [];
+
+function initPlague() {
+  plagueFound = 0;
+  document.getElementById('plague-found').textContent = 0;
+  document.getElementById('plague-feedback').textContent = '';
+  const shuffled = [...realPlagues].sort(() => Math.random() - 0.5);
+  plagueItems = shuffled;
+  const grid = document.getElementById('plague-grid');
+  grid.innerHTML = '';
+  shuffled.forEach((plague, i) => {
+    const card = document.createElement('div');
+    card.className = 'plague-card';
+    card.dataset.real = plague.real;
+    card.dataset.idx = i;
+    card.innerHTML = `<span class="p-emoji">${plague.emoji}</span><div class="p-name">${plague.name}</div>`;
+    card.addEventListener('click', () => selectPlague(card, plague));
+    grid.appendChild(card);
+  });
+}
+
+function selectPlague(card, plague) {
+  if (card.classList.contains('revealed') || card.classList.contains('wrong')) return;
+  const fb = document.getElementById('plague-feedback');
+  if (plague.real) {
+    if (!card.classList.contains('correct')) {
+      card.classList.add('correct', 'revealed');
+      plagueFound++;
+      document.getElementById('plague-found').textContent = plagueFound;
+      if (plagueFound === 10) {
+        fb.textContent = '🎊 Amazing! You found all 10 plagues! Chag Sameach!';
+        fb.style.color = '#F4C430';
+        launchConfetti();
+      } else {
+        fb.textContent = '✅ Yes! "' + plague.name + '" is one of the 10 plagues!';
+        fb.style.color = '#58d68d';
+      }
+    }
+  } else {
+    card.classList.add('wrong');
+    fb.textContent = '❌ "' + plague.name + '" is not one of the 10 plagues. Try again!';
+    fb.style.color = '#e74c3c';
+    setTimeout(() => card.classList.remove('wrong'), 1000);
+  }
+}
+
+initPlague();
+</script>
+</body>
+</html>
